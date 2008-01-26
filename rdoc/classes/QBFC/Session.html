@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: QBFC::Session</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">QBFC::Session</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/qbfc/session_rb.html">
+                lib/qbfc/session.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Encapsulates a <a href="../QBFC.html">QBFC</a> session.
+</p>
+<pre>
+  QBFC::Session.open(:app_name =&gt; 'Test Application') do |qb|
+    qb.customers.find(:all).each do |customer|
+      puts customer.full_name
+    end
+  end
+
+  qb = QBFC::Session.new(:app_name =&gt; 'Test Application')
+  qb.customers.find(:all).each do |customer|
+    puts customer.full_name
+  end
+  qb.close
+</pre>
+<p>
+A <a href="Session.html">QBFC::Session</a> abstracts the ole_methods so
+that more conventional Ruby method names are used, e.g. <tt>full_name</tt>
+instead of <tt>FullName.GetValue()</tt>.
+</p>
+<p>
+This also allows a shortcut for setting up Quickbooks objects:
+</p>
+<ul>
+<li>session.customers.find(:all) instead of QBFC::Customer.find(session, :all)
+
+</li>
+<li>session.customer(&#8216;CustomerFullName&#8217;) instead of
+QBFC::Customer.find(session, &#8216;CustomerFullName&#8217;)
+
+</li>
+</ul>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000015">close</a>&nbsp;&nbsp;
+      <a href="#M000014">new</a>&nbsp;&nbsp;
+      <a href="#M000013">open</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000014" class="method-detail">
+        <a name="M000014"></a>
+
+        <div class="method-heading">
+          <a href="#M000014" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+See <a href="Session.html#M000013">Session.open</a> for initialization
+options.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000014-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/qbfc/session.rb, line 68</span>
+68:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">options</span> = {})
+69:     <span class="ruby-ivar">@ole_object</span> = <span class="ruby-constant">WIN32OLE</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;QBFC6.QBSessionManager&quot;</span>)
+70: 
+71:     <span class="ruby-ivar">@ole_object</span>.<span class="ruby-constant">OpenConnection2</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:app_id</span>].<span class="ruby-identifier">to_s</span>,
+72:                                  (<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:app_name</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">&quot;Ruby QBFC Application&quot;</span>),
+73:                                  (<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:conn_type</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">QBFC_CONST</span><span class="ruby-operator">::</span><span class="ruby-constant">CtLocalQBD</span>))
+74: 
+75:     <span class="ruby-keyword kw">begin</span>
+76:       <span class="ruby-ivar">@ole_object</span>.<span class="ruby-constant">BeginSession</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:filename</span>].<span class="ruby-identifier">to_s</span>,
+77:                                 (<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:open_mode</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">QBFC_CONST</span><span class="ruby-operator">::</span><span class="ruby-constant">OmDontCare</span>))
+78:     <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">WIN32OLERuntimeError</span>
+79:       <span class="ruby-ivar">@ole_object</span>.<span class="ruby-constant">CloseConnection</span>
+80:       <span class="ruby-ivar">@ole_object</span> = <span class="ruby-keyword kw">nil</span>
+81:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">QBFC</span><span class="ruby-operator">::</span><span class="ruby-constant">QuickbooksClosedError</span>, <span class="ruby-value str">&quot;BeginSession failed: Quickbooks must be open or a valid filename specified.&quot;</span>
+82:     <span class="ruby-keyword kw">end</span>
+83:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
+
+        <div class="method-heading">
+          <a href="#M000013" class="method-signature">
+          <span class="method-name">open</span><span class="method-args">(*options) {|qb| ...}</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Open a <a href="../QBFC.html">QBFC</a> session. Takes options as a hash,
+and an optional block. Options are:
+</p>
+<ul>
+<li><tt>app_name</tt>: Name that the application sends to Quickbooks (used for
+allowing/denying access) (defaults to &#8216;Ruby <a
+href="../QBFC.html">QBFC</a> Application&#8216;
+
+</li>
+<li><tt>app_id</tt>: Per the Quickbooks SDK (<a href="../QBFC.html">QBFC</a>
+Language Reference): &#8216;Normally not assigned. Use an empty string for
+appID.&#8217; An empty string is passed by default.
+
+</li>
+<li><tt>conn_type</tt>: QBFC_CONST::CtUnknown, CtLocalQBD, CtRemoteQBD,
+CtLocalQBDLaunchUI, or CtRemoteQBOE. Default is QBFC_CONST::CtLocalQBD (1)
+
+</li>
+<li><tt>filename</tt>: The full path to the Quickbooks file; leave blank to
+connect to the currently open company file. Default is an empty string
+(Quickbooks should be running).
+
+</li>
+<li><tt>open_mode</tt>: The desired access mode. It can be one of three values:
+
+<pre>
+  - QBFC_CONST::OmSingleUser (specifies single-user mode)
+  - QBFC_CONST::OmMultiUser (specifies multi-user mode)
+  - QBFC_CONST::OmDontCare (accept whatever mode is currently in effect, or single-user mode if no other mode is in effect)
+</pre>
+<p>
+Default is QBFC_CONST::OmDontCare
+</p>
+</li>
+</ul>
+<p>
+If given a block, it yields the <a href="Session.html">Session</a> object
+and closes the <a href="Session.html">Session</a> and Connection when the
+block closes.
+</p>
+<p>
+Otherwise, it returns the new <a href="Session.html">Session</a> object.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000013-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/qbfc/session.rb, line 52</span>
+52:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">open</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">options</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+53:       <span class="ruby-identifier">qb</span> = <span class="ruby-identifier">new</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">options</span>)
+54:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+55:         <span class="ruby-keyword kw">begin</span>
+56:           <span class="ruby-keyword kw">yield</span> <span class="ruby-identifier">qb</span>
+57:         <span class="ruby-keyword kw">ensure</span>
+58:           <span class="ruby-identifier">qb</span>.<span class="ruby-identifier">close</span>
+59:         <span class="ruby-keyword kw">end</span>
+60:       <span class="ruby-keyword kw">else</span>
+61:         <span class="ruby-identifier">qb</span>
+62:       <span class="ruby-keyword kw">end</span>
+63:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000015" class="method-detail">
+        <a name="M000015"></a>
+
+        <div class="method-heading">
+          <a href="#M000015" class="method-signature">
+          <span class="method-name">close</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Close the session with Quickbooks. If this is ommitted, Quickbooks will not
+close. Using a block with <a href="Session.html#M000013">Session.open</a>
+ensures the session is closed.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000015-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/qbfc/session.rb, line 87</span>
+87:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">close</span>
+88:     <span class="ruby-ivar">@ole_object</span>.<span class="ruby-constant">EndSession</span>
+89:     <span class="ruby-ivar">@ole_object</span>.<span class="ruby-constant">CloseConnection</span>
+90:     <span class="ruby-ivar">@ole_object</span> = <span class="ruby-keyword kw">nil</span>
+91:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
