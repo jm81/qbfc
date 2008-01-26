@@ -1,6 +1,12 @@
 module QBFC
-  class QuickbooksClosedError < RuntimeError; end;
-  class SetValueMissing < RuntimeError; end;
+  class QuickbooksClosedError < RuntimeError #:nodoc:
+  end
+  class SetValueMissing < RuntimeError#:nodoc:
+  end
+  class QBXMLVersionError < RuntimeError#:nodoc:
+  end
+  class UnknownRequestError < RuntimeError#:nodoc:
+  end
 end
 
 # Encapsulates a QBFC session.
