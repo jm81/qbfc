@@ -1,19 +1,37 @@
 class QBFC::Base
   class << self
+
+    # Does this class support read operations,
+    # i.e. does QBFC support a Query request for this type?
+    # Notably, this means that the full finder is enabled
+    # (see +find+ for details).
     def allows_read?
       self.const_defined?(:ALLOWS_READ) ? self::ALLOWS_READ : false
     end
 
+    # Does this class support create operations,
+    # i.e. does QBFC support an Add request for this type?
     def allows_create?
       self.const_defined?(:ALLOWS_CREATE) ? self::ALLOWS_CREATE : false
     end
 
+    # Does this class support update operations,
+    # i.e. does QBFC support an Modify request for this type?
     def allows_update?
       self.const_defined?(:ALLOWS_UPDATE) ? self::ALLOWS_UPDATE : false
     end
 
+    # Does this class support delete operations,
+    # i.e. is this class supported by QBFC's TxnDel or ListDel or
+    # have its own Del request.
     def allows_delete?
       self.const_defined?(:ALLOWS_DELETE) ? self::ALLOWS_DELETE : false
+    end
+    
+    # Does this class support void operations,
+    # i.e. is this class supported by QBFC's TxnVoid request
+    def allows_void?
+      self.const_defined?(:ALLOWS_VOID) ? self::ALLOWS_VOID : false
     end
   
     def find(sess, *args)
