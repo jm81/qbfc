@@ -47,7 +47,7 @@ module QBFC
   # Set up types with Query
   (ELEMENTS_ADD_QUERY + ELEMENTS_ADD_MOD_QUERY + ELEMENTS_QUERY).uniq.each do | qb_element_name |
     const_get(qb_element_name).class_eval do
-      include QBFC::ElementQuery
+      const_set(:ALLOWS_READ, true)
     end
   end
 end
