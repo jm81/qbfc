@@ -148,7 +148,3 @@ class QBFC::Base
   end
 end
 
-# Load extension modules
-Dir[File.dirname(__FILE__) + "/element_extensions/*.rb"].each do |file|
-  require(file)
-end
