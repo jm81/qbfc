@@ -17,7 +17,7 @@ module QBFC
   end
 end
 
-%w{ ole_wrapper qbfc_const session request base entity_group qb_types }.each do |file|
+%w{ ole_wrapper qbfc_const session request base qb_collection qb_types }.each do |file|
   require File.dirname(__FILE__) + '/qbfc/' + file
 end
 
