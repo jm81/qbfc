@@ -1,14 +1,35 @@
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
+gem 'rspec'
+require 'spec/rake/spectask'
 
-desc 'Default: run unit tests.'
+QBFC_ROOT = File.dirname(__FILE__)
+
 task :default => :spec
 
-desc 'Run all Ruby QBFC specs.'
-Rake::TestTask.new(:spec) do |t|
-  t.libs << 'lib'
-  t.pattern = 'spec/**/*_spec.rb'
+desc "Run all specs in spec directory (excluding plugin specs)"
+Spec::Rake::SpecTask.new(:spec) do |t|
+  t.spec_opts = ['--options', "\"#{QBFC_ROOT}/spec/spec.opts\""]
+  t.spec_files = FileList['spec/**/*_spec.rb']
+end
+
+namespace :spec do
+  desc "Run all specs in spec directory with RCov (excluding plugin specs)"
+  Spec::Rake::SpecTask.new(:rcov) do |t|
+    t.spec_opts = ['--options', "\"#{QBFC_ROOT}/spec/spec.opts\""]
+    t.spec_files = FileList['spec/**/*_spec.rb']
+    t.rcov = true
+    t.rcov_opts = lambda do
+      IO.readlines("#{QBFC_ROOT}/spec/rcov.opts").map {|l| l.chomp.split " "}.flatten
+    end
+  end
+  
+  desc "Print Specdoc for all specs (excluding plugin specs)"
+  Spec::Rake::SpecTask.new(:doc) do |t|
+    t.spec_opts = ["--format", "specdoc", "--dry-run"]
+    t.spec_files = FileList['spec/**/*_spec.rb']
+  end
 end
 
 desc 'Generate documentation for the qbfc plugin.'
