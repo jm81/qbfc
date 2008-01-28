@@ -54,9 +54,9 @@ module QBFC
         lower_case_method_missing(symbol, *params)
       else
         resp = @ole_object.send(symbol, *params)
-        resp.kind_of?(WIN32OLE) ?
+        return( resp.kind_of?(WIN32OLE) ?
           self.class.new(resp) :
-          resp
+          resp )
       end
     end
     
@@ -86,7 +86,7 @@ module QBFC
       if detect_ole_method?(obj, "SetValue")
         obj.SetValue(*params)
       else
-        raise SetValueMissing, "SetValue is expected, but missing, for #{symbol.to_s.camelize}"
+        raise SetValueMissing, "SetValue is expected, but missing, for #{ole_method_name}"
       end
     end
     
@@ -101,7 +101,7 @@ module QBFC
           obj.GetValue
         end
       else
-        obj.kind_of?(WIN32OLE) ? self.class.new(obj) : obj
+        return(obj.kind_of?(WIN32OLE) ? self.class.new(obj) : obj)
       end
     end
 
@@ -116,7 +116,7 @@ module QBFC
       return ary
     end
     
-    # Creates a QBFC::Base inherited object from a if the return of
+    # Creates a QBFC::Base inherited object if the return of
     # OLEMethodName appears to be a reference to such an object.
     def create_ref(symbol, is_entity = false)
       ref_ole_name = symbol.to_s.camelize + (is_entity ? "EntityRef" : "Ref")

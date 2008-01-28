@@ -48,7 +48,25 @@ describe QBFC::OLEWrapper do
       @full_name.stub!(:ole_methods).and_return(['GetValue', 'SetValue'])
       
       @ole_object.stub!(:FullName).and_return(@full_name)
-      @ole_object.stub!(:ole_methods).and_return(['FullName', 'LineRetList', 'PayeeEntityRef', 'AccountRef'])
+      @ole_object.stub!(:ole_methods).and_return(['FullName', 'LineRetList', 'PayeeEntityRef', 'AccountRef', 'TimeModified'])
+    end
+    
+    it "should call a capitalized method directly" do
+      @ole_object.should_receive(:TestValue).and_return(0)
+      QBFC::OLEWrapper.should_not_receive(:new)
+      
+      @wrapper.qbfc_method_missing(@sess, :TestValue).should == 0
+    end
+    
+    it "should call a capitalized method directly and wrap in OLEWrapper if it returns a WIN32OLE" do
+      @full_name = WIN32OLE.new("QBFC6.QBSessionManager")
+      @ole_object.should_receive(:FullName).and_return(@full_name)
+      @full_name.should_not_receive(:GetValue)
+      
+      @full_name_wrapper = QBFC::OLEWrapper.new(@ole_object)
+      QBFC::OLEWrapper.should_receive(:new).with(@full_name).and_return(@full_name_wrapper)
+      
+      @wrapper.qbfc_method_missing(@sess, :FullName).should == @full_name_wrapper
     end
 
     it "should act as a getter method" do
@@ -58,11 +76,47 @@ describe QBFC::OLEWrapper do
       @wrapper.qbfc_method_missing(@sess, :full_name).should == 'Full Name'
     end
     
+    it "should convert return of date/time getter methods to Time" do
+      time_modified = @full_name
+      @ole_object.should_receive(:TimeModified).and_return(time_modified)
+      time_modified.should_receive(:GetValue).and_return('2007-01-01 10:00:00')
+      
+      ret = @wrapper.qbfc_method_missing(@sess, :time_modified)
+      ret.should be_kind_of(Time)
+      ret.strftime("%Y-%m-%d %H:%M:%S").should == '2007-01-01 10:00:00'
+    end
+    
+    it "should wrap WIN32OLE objects returned by getter that don't respond to GetValue" do
+      @full_name = WIN32OLE.new("QBFC6.QBSessionManager")
+      @ole_object.should_receive(:FullName).and_return(@full_name)
+      @full_name.should_receive(:ole_methods).and_return(['SetValue'])
+      @full_name.should_not_receive(:GetValue)
+      
+      @full_name_wrapper = QBFC::OLEWrapper.new(@ole_object)
+      QBFC::OLEWrapper.should_receive(:new).with(@full_name).and_return(@full_name_wrapper)
+      
+      @wrapper.qbfc_method_missing(@sess, :full_name).should == @full_name_wrapper
+    end
+    
+    it "should return non-WIN32OLE returned by getter that don't respond to GetValue" do
+      @ole_object.should_receive(:FullName).and_return('Full Name')
+      @full_name.should_not_receive(:GetValue)
+      @wrapper.qbfc_method_missing(@sess, :full_name).should == 'Full Name'
+    end
+    
     it "should act as a setter method" do
       @ole_object.should_receive(:FullName).and_return(@full_name)
       @full_name.should_receive(:SetValue).with('Full Name')
       
       @wrapper.qbfc_method_missing(@sess, :full_name=, 'Full Name')
+    end
+    
+    it "should raise SetValueMissing error on a setter call for a method without SetValue" do
+      @ole_object.should_receive(:FullName).and_return(@full_name)
+      @full_name.should_receive(:ole_methods).and_return(['GetValue'])
+      
+      lambda { @wrapper.qbfc_method_missing(@sess, :full_name=, 'Full Name') }.
+        should raise_error(QBFC::SetValueMissing)
     end
     
     it "should wrap *RetList objects in an Array" do
@@ -95,6 +149,11 @@ describe QBFC::OLEWrapper do
       QBFC::Entity.should_receive(:find_by_list_id).with(@sess, list_id).and_return(entity)
       
       @wrapper.qbfc_method_missing(@sess, :payee).should == entity
+    end
+    
+    it "should return nil for a *Ref if the ole_method calling *Ref returns nil" do
+      @ole_object.should_receive(:PayeeEntityRef).and_return(nil)      
+      @wrapper.qbfc_method_missing(@sess, :payee).should be_nil
     end
     
     it "should create a Base-inherited object from a *Ref" do
