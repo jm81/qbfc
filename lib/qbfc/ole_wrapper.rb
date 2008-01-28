@@ -15,6 +15,7 @@ module QBFC
   # When an OLE method called via OLEWrapper returns a WIN32OLE object, a new
   # OLEWrapper object is created with the WIN32OLE object and returned.
   class OLEWrapper
+    attr_reader :ole_object
   
     # Set up wrapped object, by passing a WIN32OLE object
     # (or a String with the name of a WIN32OLE server)
