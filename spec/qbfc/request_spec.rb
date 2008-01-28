@@ -4,8 +4,8 @@ describe QBFC::Request do
 
   before(:each) do
     @sess = mock(QBFC::Session)
-    @request_set = mock(WIN32OLE)
-    @ole_request = mock(WIN32OLE)
+    @request_set = mock(QBFC::OLEWrapper)
+    @ole_request = mock(QBFC::OLEWrapper)
 
     @sess.stub!(:CreateMsgSetRequest).and_return(@request_set)
     @request_set.stub!(:AppendCustomerQueryRq).and_return(@ole_request)
@@ -18,11 +18,6 @@ describe QBFC::Request do
   
   it "appends a query to MsgSetRequest" do
     @request_set.should_receive(:AppendCustomerQueryRq).and_return @ole_request
-    QBFC::Request.new(@sess, 'CustomerQuery')
-  end
-  
-  it "should wrap request object in OLEWrapper" do
-    QBFC::OLEWrapper.should_receive(:new).with(@ole_request)
     QBFC::Request.new(@sess, 'CustomerQuery')
   end
 
@@ -54,8 +49,8 @@ describe QBFC::Request do
   describe "QBFC::Request#response" do
     before(:each) do
       @sess = mock(QBFC::Session)
-      @request_set = mock(WIN32OLE)
-      @ole_request = mock(WIN32OLE)
+      @request_set = mock(QBFC::OLEWrapper)
+      @ole_request = mock(QBFC::OLEWrapper)
   
       @sess.stub!(:CreateMsgSetRequest).and_return(@request_set)
       @request_set.stub!(:AppendCustomerQueryRq).and_return(@ole_request)
@@ -79,7 +74,7 @@ describe QBFC::Request do
 
       request = QBFC::Request.new(@sess, 'CustomerQuery')
 
-      request.response.should be_kind_of(QBFC::OLEWrapper)
+      request.response.should == @detail
     end
     
     it "returns a nil response if the response has no Detail" do

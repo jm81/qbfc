@@ -29,7 +29,7 @@ module QBFC
       end
       
       begin
-        @request = OLEWrapper.new(@request_set.send("Append#{request_type}Rq"))
+        @request = @request_set.send("Append#{request_type}Rq")
       rescue WIN32OLERuntimeError => error
         if error.to_s =~ /error code:0x80020006/
           raise QBFC::UnknownRequestError, "Unknown request name '#{request_type}'"
@@ -42,10 +42,7 @@ module QBFC
     # Submit the Request and return the response Detail, wrapped in OLEWrapper (unless nil).
     # The response does not include any MsgSetResponse attributes.
     def response
-      detail = @sess.DoRequests(@request_set).ResponseList.GetAt(0).Detail
-      detail ? 
-        QBFC::OLEWrapper.new(detail) :
-        nil
+      @sess.DoRequests(@request_set).ResponseList.GetAt(0).Detail
     end
     
     # Send missing methods to @ole_object (OLEWrapper)
