@@ -29,6 +29,11 @@ module QBFC
       @ole_object.ole_methods
     end
     
+    # Does this OLE object respond to the given ole method?
+    def respond_to_ole?(symbol)
+      detect_ole_method?(@ole_object, symbol)
+    end
+    
     # Use [idx] syntax for objects that respond to <tt>GetAt(idx)</tt>
     def [](idx)
       if idx.kind_of? Integer
@@ -72,9 +77,9 @@ module QBFC
       elsif detect_ole_method?(@ole_object, symbol.to_s.singularize.camelize + "RetList")
         setup_array(symbol.to_s.singularize.camelize + "RetList")
       elsif detect_ole_method?(@ole_object, symbol.to_s.camelize + "EntityRef")
-        create_ref(symbol, true)
+        create_ref(symbol, true, *params)
       elsif detect_ole_method?(@ole_object, symbol.to_s.camelize + "Ref")
-        create_ref(symbol)
+        create_ref(symbol, false, *params)
       else
         raise NoMethodError, symbol
       end 
@@ -119,13 +124,13 @@ module QBFC
     
     # Creates a QBFC::Base inherited object if the return of
     # OLEMethodName appears to be a reference to such an object.
-    def create_ref(symbol, is_entity = false)
+    def create_ref(symbol, is_entity = false, *options)
       ref_ole_name = symbol.to_s.camelize + (is_entity ? "EntityRef" : "Ref")
       ref_ole_object = @ole_object.send(ref_ole_name)
       if ref_ole_object
         is_entity ?
-          QBFC::Entity.find_by_list_id(@sess, ref_ole_object.ListID.GetValue()) :
-          QBFC::const_get("#{symbol.to_s.camelize}").find_by_list_id(@sess, ref_ole_object.ListID.GetValue())
+          QBFC::Entity.find_by_list_id(@sess, ref_ole_object.ListID.GetValue(), *options) :
+          QBFC::const_get("#{symbol.to_s.camelize}").find_by_list_id(@sess, ref_ole_object.ListID.GetValue(), *options)
       else
         return nil
       end

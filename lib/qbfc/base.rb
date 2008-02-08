@@ -88,48 +88,71 @@ class QBFC::Base
       end
     end
     
-    def find_by_full_name_or_list_id(sess, id)
+    def find_by_full_name_or_list_id(sess, id, query_options = {})
       id =~ /\d+-\d+/ ?
-        find_by_list_id(sess, id) :
-        find_by_full_name(sess, id)
+        find_by_list_id(sess, id, query_options) :
+        find_by_full_name(sess, id, query_options)
     end
     
-    def find_by_list_id(sess, list_id)
-      q = create_query(sess)
+    def find_by_list_id(sess, list_id, query_options = {})
       if self.class_name == "Entity"
+        q = create_query(sess)
         q.send("ORListQuery").ListIDList.Add(list_id)
-        create_entity(sess, q.response[0])
+        create_entity(sess, q.response[0], query_options)
       else
-        q.send("OR#{self.class_name}ListQuery").ListIDList.Add(list_id)
+        q = create_query(sess, query_options)
+        q.send(self.list_query).ListIDList.Add(list_id)
         new(sess, q.response[0])
       end
     end
   
-    def find_by_full_name(sess, full_name)
-      q = create_query(sess)
+    def find_by_full_name(sess, full_name, options = {})
       if self.class_name == "Entity"
+        q = create_query(sess)
         q.send("ORListQuery").FullNameList.Add(full_name)
-        create_entity(sess, q.response[0])
+        create_entity(sess, q.response[0], query_options)
       else
-        q.send("OR#{self.class_name}ListQuery").FullNameList.Add(full_name)
+        q = create_query(sess, query_options)
+        q.send(self.list_query).FullNameList.Add(full_name)
         new(sess, q.response[0])
       end
     end
     
     alias_method :find_by_name, :find_by_full_name
     
-    def create_query(sess)
-      QBFC::Request.new(sess, "#{self.class_name}Query")
+    def list_query
+      if self.class_name == "Employee" || self.class_name == "OtherName"
+        "ORListQuery"
+      else
+        "OR#{self.class_name}ListQuery"
+      end
     end
     
-    def create_entity(sess, r)
+    def create_query(sess, query_options = {})
+      q = QBFC::Request.new(sess, "#{self.class_name}Query")
+      if query_options[:owner_id]
+        q.OwnerIDList.Add(query_options[:owner_id]) 
+      end
+      q
+    end
+    
+    def create_entity(sess, r, query_options = {})
+      ret = get_entity_ret(sess, r)
+      if query_options.empty?
+        ret
+      else
+        ret.class.find_by_list_id(sess, ret.ListID.GetValue(), query_options)
+      end
+    end
+    
+    def get_entity_ret(sess, r)
       return QBFC::Vendor.new(sess, r.VendorRet) if r.VendorRet
       return QBFC::Employee.new(sess, r.EmployeeRet) if r.EmployeeRet
       return QBFC::OtherName.new(sess, r.OtherNameRet) if r.OtherNameRet
       return QBFC::Customer.new(sess, r.CustomerRet) if r.CustomerRet
     end
     
-    private :create_query, :create_entity
+    private :create_query, :create_entity, :get_entity_ret
   
     def class_name
       self.name.split('::').last
@@ -157,8 +180,21 @@ class QBFC::Base
       @ole_object.Name.GetValue
   end
   
+  # Access custom fields
+  def custom(field_name, owner_id = 0)
+    return nil unless @ole_object.DataExtRetList
+    @ole_object.data_ext.each do |field|
+      return field.data_ext_value if field.data_ext_name == field_name
+    end
+    return nil
+  end
+  
   def ole_methods
     @ole_object.ole_methods
+  end
+  
+  def respond_to_ole?(symbol)
+    @ole_object.respond_to_ole?(symbol)
   end
   
   def method_missing(symbol, *params)
