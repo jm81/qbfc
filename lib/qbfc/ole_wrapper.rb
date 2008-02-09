@@ -72,22 +72,22 @@ module QBFC
     def lower_case_method_missing(symbol, *params)
       if '=' == symbol.to_s[-1].chr
         set_value(symbol.to_s[0..-2], *params)
-      elsif detect_ole_method?(@ole_object, symbol.to_s.camelize)
+      elsif detect_ole_method?(@ole_object, symbol.to_s.camelize.gsub(/Id/, 'ID'))
         get_value(symbol, *params)
-      elsif detect_ole_method?(@ole_object, symbol.to_s.singularize.camelize + "RetList")
-        setup_array(symbol.to_s.singularize.camelize + "RetList")
+      elsif detect_ole_method?(@ole_object, (s = symbol.to_s.singularize.camelize + "RetList"))
+        setup_array(s)
       elsif detect_ole_method?(@ole_object, symbol.to_s.camelize + "EntityRef")
         create_ref(symbol, true, *params)
       elsif detect_ole_method?(@ole_object, symbol.to_s.camelize + "Ref")
         create_ref(symbol, false, *params)
       else
-        raise NoMethodError, symbol
+        raise NoMethodError, symbol.to_s
       end 
     end
     
     # Sets a value by calling OLEMethodName.SetValue(*params)
     def set_value(ole_method_name, *params)
-      obj = @ole_object.send(ole_method_name.to_s.camelize)
+      obj = @ole_object.send(ole_method_name.to_s.camelize.gsub(/Id/, 'ID'))
 
       if detect_ole_method?(obj, "SetValue")
         obj.SetValue(*params)
@@ -98,8 +98,7 @@ module QBFC
     
     # Gets a value by calling OLEMethodName.GetValue
     def get_value(ole_method_name, *params)
-      obj = @ole_object.send(ole_method_name.to_s.camelize, *params)
-
+      obj = @ole_object.send(ole_method_name.to_s.camelize.gsub(/Id/, 'ID'), *params)
       if detect_ole_method?(obj, "GetValue")
         if ole_method_name.to_s =~ /date/i || ole_method_name.to_s =~ /time/i 
           Time.parse(obj.GetValue)

@@ -48,7 +48,7 @@ describe QBFC::OLEWrapper do
       @full_name.stub!(:ole_methods).and_return(['GetValue', 'SetValue'])
       
       @ole_object.stub!(:FullName).and_return(@full_name)
-      @ole_object.stub!(:ole_methods).and_return(['FullName', 'LineRetList', 'PayeeEntityRef', 'AccountRef', 'TimeModified'])
+      @ole_object.stub!(:ole_methods).and_return(['FullName', 'LineRetList', 'PayeeEntityRef', 'AccountRef', 'TimeModified', 'ListID'])
     end
     
     it "should call a capitalized method directly" do
@@ -74,6 +74,13 @@ describe QBFC::OLEWrapper do
       @full_name.should_receive(:GetValue).and_return('Full Name')
       
       @wrapper.qbfc_method_missing(@sess, :full_name).should == 'Full Name'
+    end
+         
+    it "should convert 'Id' to 'ID' in getter" do
+      @ole_object.should_receive(:ListID).and_return(@full_name)
+      @full_name.should_receive(:GetValue).and_return('{123-456}')
+      
+      @wrapper.qbfc_method_missing(@sess, :list_id).should == '{123-456}'
     end
     
     it "should convert return of date/time getter methods to Time" do
@@ -109,6 +116,13 @@ describe QBFC::OLEWrapper do
       @full_name.should_receive(:SetValue).with('Full Name')
       
       @wrapper.qbfc_method_missing(@sess, :full_name=, 'Full Name')
+    end
+
+    it "should convert 'Id' to 'ID' in setter" do
+      @ole_object.should_receive(:ListID).and_return(@full_name)
+      @full_name.should_receive(:SetValue).and_return('{123-456}')
+      
+      @wrapper.qbfc_method_missing(@sess, :list_id=, '{123-456}')
     end
     
     it "should raise SetValueMissing error on a setter call for a method without SetValue" do
@@ -173,7 +187,7 @@ describe QBFC::OLEWrapper do
     end
     
     it "should raise NoMethodError if none of the above apply" do
-      lambda { @wrapper.qbfc_method_missing(@sess, :no_method) }.should raise_error(NoMethodError)
+      lambda { @wrapper.qbfc_method_missing(@sess, :no_method) }.should raise_error(NoMethodError, 'no_method')
     end
   end
 end
