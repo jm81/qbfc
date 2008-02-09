@@ -180,6 +180,17 @@ class QBFC::Base
       @ole_object.Name.GetValue
   end
   
+  # Get ListID or TxnID.
+  def id
+    if respond_to_ole?(:ListID)
+      @ole_object.list_id
+    elsif respond_to_ole?(:TxnID)
+      @ole_object.txn_id
+    else
+      nil
+    end
+  end
+  
   # Access custom fields
   def custom(field_name, owner_id = 0)
     return nil unless @ole_object.DataExtRetList

@@ -30,8 +30,10 @@ describe QBFC::Base do
     # Base. Some specs will be checking that this is sent a 'qbfc_method_missing'
     # message with a given set of arguments. For specs that translate those
     # arguments correct, see OLEWrapper spec.
-    @ole_object = mock('OLEWrapper')
-    @base = QBFC::Base.new(@ole_object)
+    @sess = mock(QBFC::Session)
+    @ole_object = mock(QBFC::OLEWrapper)
+    @ole_object.should_receive(:kind_of?).with(QBFC::OLEWrapper).and_return(true)
+    @base = QBFC::Base.new(@sess, @ole_object)
   end
   
   it "should specify if it allows create operations" do
@@ -57,6 +59,19 @@ describe QBFC::Base do
   it "should specify if it allows void operations" do
     QBFC::Base::allows_void?.should be_false
     QBFCSpec::Void::allows_void?.should be_true
+  end
+  
+  it "should alias txn_id as id for transaction" do
+    @ole_object.should_receive(:respond_to_ole?).with(:TxnID).and_return(true)
+    @ole_object.should_receive(:respond_to_ole?).with(:ListID).and_return(false)
+    @ole_object.should_receive(:txn_id).and_return('T123')
+    @base.id.should == 'T123'
+  end
+  
+  it "should alias list_id as id for list items" do
+    @ole_object.should_receive(:respond_to_ole?).with(:ListID).and_return(true)
+    @ole_object.should_receive(:list_id).and_return('L123')
+    @base.id.should == 'L123'
   end  
   
 end
