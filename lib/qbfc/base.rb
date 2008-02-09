@@ -159,13 +159,13 @@ class QBFC::Base
     end
   end
   
-  def initialize(sess, ole_object = nil)
+  def initialize(sess, ole_getter = nil)
     @sess = sess
     
-    if ole_object.kind_of?(QBFC::OLEWrapper)
-      @ole_object = ole_object
-    elsif ole_object.kind_of?(WIN32OLE)
-      @ole_object = QBFC::OLEWrapper.new(ole_object)
+    if ole_getter.kind_of?(QBFC::OLEWrapper)
+      @getter = ole_getter
+    elsif ole_getter.kind_of?(WIN32OLE)
+      @getter = QBFC::OLEWrapper.new(ole_getter)
     else
       # TODO: Can I create a 'generic'?
     end
@@ -175,17 +175,17 @@ class QBFC::Base
   # If an entity has a Name field but not a FullName field,
   # use Name (which, by implication, is the FullName)
   def full_name
-    @ole_object.ole_methods.detect{|m| m.to_s == "FullName"} ?
-      @ole_object.FullName.GetValue :
-      @ole_object.Name.GetValue
+    @getter.ole_methods.detect{|m| m.to_s == "FullName"} ?
+      @getter.FullName.GetValue :
+      @getter.Name.GetValue
   end
   
   # Get ListID or TxnID.
   def id
     if respond_to_ole?(:ListID)
-      @ole_object.list_id
+      @getter.list_id
     elsif respond_to_ole?(:TxnID)
-      @ole_object.txn_id
+      @getter.txn_id
     else
       nil
     end
@@ -193,23 +193,23 @@ class QBFC::Base
   
   # Access custom fields
   def custom(field_name, owner_id = 0)
-    return nil unless @ole_object.DataExtRetList
-    @ole_object.data_ext.each do |field|
+    return nil unless @getter.DataExtRetList
+    @getter.data_ext.each do |field|
       return field.data_ext_value if field.data_ext_name == field_name
     end
     return nil
   end
   
   def ole_methods
-    @ole_object.ole_methods
+    @getter.ole_methods
   end
   
   def respond_to_ole?(symbol)
-    @ole_object.respond_to_ole?(symbol)
+    @getter.respond_to_ole?(symbol)
   end
   
   def method_missing(symbol, *params)
-    @ole_object.qbfc_method_missing(@sess, symbol, *params)
+    @getter.qbfc_method_missing(@sess, symbol, *params)
   end
 end
 
