@@ -72,14 +72,14 @@ module QBFC
     def lower_case_method_missing(symbol, *params)
       if '=' == symbol.to_s[-1].chr
         set_value(symbol.to_s[0..-2], *params)
+      elsif symbol.to_s =~ /\A(\w+)_(full_name|id)\Z/ && ref_name($1)
+        get_ref_name_or_id(ref_name($1), $2)
       elsif detect_ole_method?(@ole_object, symbol.to_s.camelize.gsub(/Id/, 'ID'))
         get_value(symbol, *params)
       elsif detect_ole_method?(@ole_object, (s = symbol.to_s.singularize.camelize + "RetList"))
         setup_array(s)
-      elsif detect_ole_method?(@ole_object, symbol.to_s.camelize + "EntityRef")
-        create_ref(symbol, true, *params)
-      elsif detect_ole_method?(@ole_object, symbol.to_s.camelize + "Ref")
-        create_ref(symbol, false, *params)
+      elsif ref_name(symbol)
+        create_ref(ref_name(symbol), *params)
       else
         raise NoMethodError, symbol.to_s
       end 
@@ -121,18 +121,32 @@ module QBFC
       return ary
     end
     
+    def ref_name(symbol)
+      if detect_ole_method?(@ole_object, symbol.to_s.camelize + "Ref")
+        symbol.to_s.camelize + "Ref"
+      elsif detect_ole_method?(@ole_object, symbol.to_s.camelize + "EntityRef")
+        symbol.to_s.camelize + "EntityRef"
+      else
+        nil
+      end
+    end
+    
     # Creates a QBFC::Base inherited object if the return of
     # OLEMethodName appears to be a reference to such an object.
-    def create_ref(symbol, is_entity = false, *options)
-      ref_ole_name = symbol.to_s.camelize + (is_entity ? "EntityRef" : "Ref")
+    def create_ref(ref_ole_name, *options)
       ref_ole_object = @ole_object.send(ref_ole_name)
       if ref_ole_object
-        is_entity ?
+        ref_ole_name =~ /EntityRef/ ?
           QBFC::Entity.find_by_list_id(@sess, ref_ole_object.ListID.GetValue(), *options) :
-          QBFC::const_get("#{symbol.to_s.camelize}").find_by_list_id(@sess, ref_ole_object.ListID.GetValue(), *options)
+          QBFC::const_get(ref_ole_name.gsub(/Ref/,"")).find_by_list_id(@sess, ref_ole_object.ListID.GetValue(), *options)
       else
         return nil
       end
+    end
+    
+    def get_ref_name_or_id(symbol, field)
+      field = (field == "id" ? "ListID" : "FullName")
+      @ole_object.send(symbol).send(field).GetValue()
     end
     
     # Check if the obj has an ole_method matching the symbol.

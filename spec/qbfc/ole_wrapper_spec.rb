@@ -149,6 +149,54 @@ describe QBFC::OLEWrapper do
         [@full_name_wrapper, @full_name_wrapper]
     end
     
+    it "should have *_full_name for *Ref" do
+      ref = mock('WIN32OLE.PayeeRef')
+      @ole_object.should_receive(:AccountRef).and_return(ref)
+
+      full_name = "Full Name"
+      full_name_obj = mock('WIN32OLE.FullName')
+      ref.should_receive(:FullName).and_return(full_name_obj)
+      full_name_obj.should_receive(:GetValue).and_return(full_name)
+      
+      @wrapper.qbfc_method_missing(@sess, :account_full_name).should == full_name
+    end
+    
+    it "should have *_id for *Ref" do
+      ref = mock('WIN32OLE.PayeeRef')
+      @ole_object.should_receive(:AccountRef).and_return(ref)
+
+      list_id = "1"
+      list_id_obj = mock('WIN32OLE.ListID')
+      ref.should_receive(:ListID).and_return(list_id_obj)
+      list_id_obj.should_receive(:GetValue).and_return(list_id)
+      
+      @wrapper.qbfc_method_missing(@sess, :account_id).should == list_id
+    end
+    
+    it "should have *_full_name for *EntityRef" do
+      ref = mock('WIN32OLE.PayeeEntityRef')
+      @ole_object.should_receive(:PayeeEntityRef).and_return(ref)
+
+      full_name = "Full Name"
+      full_name_obj = mock('WIN32OLE.FullName')
+      ref.should_receive(:FullName).and_return(full_name_obj)
+      full_name_obj.should_receive(:GetValue).and_return(full_name)
+      
+      @wrapper.qbfc_method_missing(@sess, :payee_full_name).should == full_name
+    end
+
+    it "should have *_id for *EntityRef" do
+      ref = mock('WIN32OLE.PayeeEntityRef')
+      @ole_object.should_receive(:PayeeEntityRef).and_return(ref)
+
+      list_id = "1"
+      list_id_obj = mock('WIN32OLE.ListID')
+      ref.should_receive(:ListID).and_return(list_id_obj)
+      list_id_obj.should_receive(:GetValue).and_return(list_id)
+      
+      @wrapper.qbfc_method_missing(@sess, :payee_id).should == list_id
+    end
+    
     it "should create a Base-inherited object from a *EntityRef" do
       entity_ref = mock('WIN32OLE.PayeeEntityRef')
       @ole_object.should_receive(:PayeeEntityRef).and_return(entity_ref)
