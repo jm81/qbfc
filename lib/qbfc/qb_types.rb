@@ -57,4 +57,10 @@ module QBFC
       const_set(:ALLOWS_UPDATE, true)
     end
   end
+  
+  (ELEMENTS_ADD + ELEMENTS_ADD_MOD_QUERY + ELEMENTS_ADD_MOD + ELEMENTS_ADD_QUERY).uniq.each do | qb_element_name |
+    const_get(qb_element_name).class_eval do
+      const_set(:ALLOWS_CREATE, true)
+    end
+  end  
 end

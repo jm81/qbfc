@@ -167,10 +167,12 @@ class QBFC::Base
     elsif ole.kind_of?(WIN32OLE)
       @ole = QBFC::OLEWrapper.new(ole)
     else
-      # TODO: Can I create a 'generic'?
+      add_rq = QBFC::Request.new(sess, "#{self.class.class_name}Add")
+      @ole =  QBFC::OLEWrapper.new(add_rq.ole_object)
+      @setter = add_rq
     end
     
-    if self.class.allows_update?
+    if self.class.allows_update? && ole
       mod = QBFC::Request.new(sess, "#{self.class.class_name}Mod")
           
       if respond_to_ole?(:ListID)
