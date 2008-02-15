@@ -58,7 +58,15 @@ class QBFC::Base
               txn_date_filter = q.ORTxnQuery.TxnFilter.ORDateRangeFilter.TxnDateRangeFilter.ORTxnDateRangeFilter.TxnDateFilter
               txn_date_filter.FromTxnDate.SetValue( filters[:txn_date][0] ) if filters[:txn_date][0]
               txn_date_filter.ToTxnDate.SetValue( filters[:txn_date][1] ) if filters[:txn_date][1]
+              filters.delete(:txn_date)
             end
+            
+            filters.each do |filter, value|
+              q.send("OR#{self.class_name}Query").
+                send("#{self.class_name}Filter").
+                send("#{filter}=", QBFC_CONST::PsNotPaidOnly)
+            end
+            
             options.delete(:conditions)
           end
           options.each do |key, value|
