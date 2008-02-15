@@ -88,6 +88,8 @@ module QBFC
         get_value(symbol, *params)
       elsif detect_ole_method?(@ole_object, (s = symbol.to_s.singularize.camelize + "RetList"))
         setup_array(s)
+      elsif detect_ole_method?(@ole_object, (s = "OR" + symbol.to_s.singularize.camelize + "RetList"))
+        setup_array(s, true)
       elsif ref_name(symbol)
         create_ref(ref_name(symbol), *params)
       else
@@ -135,11 +137,15 @@ module QBFC
 
     # Sets up an array to return if the return of OLEMethodName appears
     # to be a list structure.
-    def setup_array(ole_method_name)
+    def setup_array(ole_method_name, is_OR_list)
       list = @ole_object.send(ole_method_name)
       ary = []
       0.upto(list.Count - 1) do |i|
-        ary << self.class.new(list.GetAt(i))
+        if is_OR_list
+          ary << self.class.new(list.GetAt(i)).send(ole_method_name.match(/\AOR(.*)List\Z/)[1])
+        else
+          ary << self.class.new(list.GetAt(i))
+        end
       end
       return ary
     end
