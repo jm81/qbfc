@@ -81,4 +81,10 @@ module QBFC
       const_set(:ALLOWS_DELETE, :element)
     end
   end
+  
+  TXN_VOID_TYPES.each do | qb_element_name |
+    const_get(qb_element_name).class_eval do
+      const_set(:ALLOWS_VOID, true)
+    end
+  end
 end

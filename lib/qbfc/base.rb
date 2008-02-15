@@ -225,7 +225,7 @@ class QBFC::Base
     if self.class.allows_delete?
       if self.class::ALLOWS_DELETE == :txn
         req = QBFC::Request.new(@sess, "TxnDel")
-        req.txn_del_type = self.class.class_name
+        req.txn_del_type = QBFC_CONST::const_get("Tdt#{self.class.class_name}")
         req.txn_id = id
       elsif self.class::ALLOWS_DELETE == :list
         req = QBFC::Request.new(@sess, "ListDel")
@@ -238,6 +238,18 @@ class QBFC::Base
       return true
     else
       raise InvalidRequestError, "#{self.class.class_name} does not support delete requests."
+    end
+  end
+  
+  def void
+    if self.class.allows_void?
+      req = QBFC::Request.new(@sess, "TxnVoid")
+      req.txn_void_type = QBFC_CONST::const_get("Tvt#{self.class.class_name}")
+      req.txn_id = id
+      req.submit
+      return true
+    else
+      raise InvalidRequestError, "#{self.class.class_name} does not support void requests."
     end
   end
   
