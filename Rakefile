@@ -40,3 +40,26 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+
+require 'rubygems'
+Gem::manage_gems
+require 'rake/gempackagetask'
+
+spec = Gem::Specification.new do |s|
+  s.name = "qbfc"
+  s.version = "0.1.0"
+  s.author = "Jared Morgan"
+  s.email = "jmorgan@morgancreative.net"
+  # s.homepage = ""
+  s.platform = Gem::Platform::CURRENT
+  s.summary = "A wrapper around the QBFC COM object of the Quickbooks SDK"
+  s.files = FileList["{bin,spec,lib}/**/*"].exclude("rdoc").to_a
+  s.require_path = "lib"
+  # s.test_file = ""
+  s.has_rdoc = true
+  s.extra_rdoc_files = ["README"]
+end
+
+Rake::GemPackageTask.new(spec) do |pkg|
+  pkg.need_tar = true
+end
