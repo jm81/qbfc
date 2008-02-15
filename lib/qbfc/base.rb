@@ -60,6 +60,14 @@ class QBFC::Base
               txn_date_filter.ToTxnDate.SetValue( filters[:txn_date][1] ) if filters[:txn_date][1]
               filters.delete(:txn_date)
             end
+
+            if filters[:ref_number]
+              ref_num_filter = q.send("OR#{self.class_name}Query").send("#{self.class_name}Filter").
+                               ORRefNumberFilter.RefNumberRangeFilter
+              ref_num_filter.FromRefNumber.SetValue( filters[:ref_number][0] ) if filters[:ref_number][0]
+              ref_num_filter.ToRefNumber.SetValue( filters[:ref_number][1] ) if filters[:ref_number][1]
+              filters.delete(:ref_number)
+            end
             
             filters.each do |filter, value|
               q.send("OR#{self.class_name}Query").
