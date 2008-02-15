@@ -137,7 +137,7 @@ module QBFC
 
     # Sets up an array to return if the return of OLEMethodName appears
     # to be a list structure.
-    def setup_array(ole_method_name, is_OR_list)
+    def setup_array(ole_method_name, is_OR_list = false)
       list = @ole_object.send(ole_method_name)
       ary = []
       0.upto(list.Count - 1) do |i|
