@@ -12,13 +12,18 @@ module QBFC
     FIXTURE_DIRNAME = File.dirname(__FILE__) + "\\fixtures"
     FIXTURE_FILENAME = FIXTURE_DIRNAME + "\\test.qbw"
     TMP_DIRNAME = File.dirname(__FILE__) + "\\tmp"
-    TMP_FILENAME = TMP_DIRNAME + "\\test.qbw"
 
     def initialize
-      FileUtils.rm_rf(TMP_DIRNAME)
-      FileUtils.cp_r FIXTURE_DIRNAME, TMP_DIRNAME
-      filename = File.expand_path(TMP_FILENAME).gsub(/\//, "\\")
-      puts filename
+      FileUtils.mkdir_p(TMP_DIRNAME)
+
+      @@i ||= 0
+      @@i += 1
+      @dirname = TMP_DIRNAME + "\\fixture_#{@@i}"
+      FileUtils.rm_rf(@dirname)
+      FileUtils.mkdir_p(@dirname)
+
+      FileUtils.cp_r FIXTURE_DIRNAME + "\\.", @dirname
+      filename = File.expand_path(@dirname + "\\test.qbw").gsub(/\//, "\\")
       @sess = QBFC::Session.new(:filename => filename)
     end
     
@@ -28,7 +33,9 @@ module QBFC
     
     def close
       @sess.close
-      FileUtils.rm_rf(TMP_DIRNAME)
+      sleep(5)
+      FileUtils.rm_rf(@dirname)
     end
   end
+
 end
