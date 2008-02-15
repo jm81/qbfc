@@ -4,10 +4,38 @@ Ruby QBFC
 Introduction goes here.
 
 
-Example
-=======
+Examples
+========
 
-Example goes here.
+  # A very simple example, finding a single Customer by name
+  QBFC::session do | qb |
+    puts qb.customer('Customer Name').full_name
+  end
+  
+  # Find all Customer, then return the first in the Array
+  # Next, find the first Customer only
+  QBFC::session do | qb |
+    customers = qb.customers.find(:all)
+    puts customers[0].full_name
+    puts qb.customers.find(:first).full_name
+  end
 
+  # Same as previous, but not using a block  
+  sess = QBFC::Session.new
+  customers = QBFC::Customer.find(sess, :all)
+  puts customers[0].full_name
+  puts QBFC::Customer.find(sess, :first).full_name
+  sess.close
+
+  # Use a QBFC::Session object, but access the COM object
+  # more directly.
+  QBFC::session do | qb |
+    request_set = qb.CreateMsgSetRequest("US", 6, 0)
+    customer_query = request_set.AppendCustomerQueryRq	
+    response = qb.DoRequests(request_set)
+    customer_set = response.ResponseList[0]
+    first_customer = customer_set.Detail[0]
+    puts first_customer.full_name
+  end
 
 Copyright (c) 2008 Jared E. Morgan, released under the MIT license
