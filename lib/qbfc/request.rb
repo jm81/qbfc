@@ -39,10 +39,14 @@ module QBFC
       end
     end
     
+    def submit
+      @sess.DoRequests(@request_set)
+    end
+    
     # Submit the Request and return the response Detail, wrapped in OLEWrapper (unless nil).
     # The response does not include any MsgSetResponse attributes.
     def response
-      @sess.DoRequests(@request_set).ResponseList.GetAt(0).Detail
+      submit.ResponseList.GetAt(0).Detail
     end
     
     # Send missing methods to @ole_object (OLEWrapper)
@@ -68,5 +72,9 @@ module QBFC
       @sess.DoRequests(@request_set).ToXMLString
     end
     
+    # Return actual WIN32OLE object
+    def ole_object
+      @request.ole_object
+    end
   end
 end

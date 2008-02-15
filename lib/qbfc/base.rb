@@ -159,15 +159,30 @@ class QBFC::Base
     end
   end
   
-  def initialize(sess, ole_getter = nil)
+  def initialize(sess, ole = nil)
     @sess = sess
     
-    if ole_getter.kind_of?(QBFC::OLEWrapper)
-      @getter = ole_getter
-    elsif ole_getter.kind_of?(WIN32OLE)
-      @getter = QBFC::OLEWrapper.new(ole_getter)
+    if ole.kind_of?(QBFC::OLEWrapper)
+      @ole = ole
+    elsif ole.kind_of?(WIN32OLE)
+      @ole = QBFC::OLEWrapper.new(ole)
     else
       # TODO: Can I create a 'generic'?
+    end
+    
+    if self.class.allows_update?
+      mod = QBFC::Request.new(sess, "#{self.class.class_name}Mod")
+          
+      if respond_to_ole?(:ListID)
+        mod.list_id = @ole.list_id
+      elsif respond_to_ole?(:TxnID)
+        mod.txn_id = @ole.txn_id
+      end
+
+      mod.edit_sequence = @ole.edit_sequence
+      
+      @setter = mod
+      @ole.setter = mod.ole_object
     end
     
   end
@@ -175,17 +190,17 @@ class QBFC::Base
   # If an entity has a Name field but not a FullName field,
   # use Name (which, by implication, is the FullName)
   def full_name
-    @getter.ole_methods.detect{|m| m.to_s == "FullName"} ?
-      @getter.FullName.GetValue :
-      @getter.Name.GetValue
+    @ole.ole_methods.detect{|m| m.to_s == "FullName"} ?
+      @ole.FullName.GetValue :
+      @ole.Name.GetValue
   end
   
   # Get ListID or TxnID.
   def id
     if respond_to_ole?(:ListID)
-      @getter.list_id
+      @ole.list_id
     elsif respond_to_ole?(:TxnID)
-      @getter.txn_id
+      @ole.txn_id
     else
       nil
     end
@@ -193,23 +208,27 @@ class QBFC::Base
   
   # Access custom fields
   def custom(field_name, owner_id = 0)
-    return nil unless @getter.DataExtRetList
-    @getter.data_ext.each do |field|
+    return nil unless @ole.DataExtRetList
+    @ole.data_ext.each do |field|
       return field.data_ext_value if field.data_ext_name == field_name
     end
     return nil
   end
   
+  def save
+    @setter.submit
+  end
+  
   def ole_methods
-    @getter.ole_methods
+    @ole.ole_methods
   end
   
   def respond_to_ole?(symbol)
-    @getter.respond_to_ole?(symbol)
+    @ole.respond_to_ole?(symbol)
   end
   
   def method_missing(symbol, *params)
-    @getter.qbfc_method_missing(@sess, symbol, *params)
+    @ole.qbfc_method_missing(@sess, symbol, *params)
   end
 end
 

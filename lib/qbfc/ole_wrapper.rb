@@ -14,14 +14,24 @@ module QBFC
   # 
   # When an OLE method called via OLEWrapper returns a WIN32OLE object, a new
   # OLEWrapper object is created with the WIN32OLE object and returned.
+  # 
+  # Now, the fun (and +really+ hackish) part. In many cases within the QBFC
+  # library, the wrapper is actually wrapping two WIN32OLE objects, the additional
+  # being a 'setter' object. This object is used when creating a ModRequest. In
+  # such cases, a method ending in '=' is always sent to both the primary and the
+  # setter objects. To facilitate this, traversing child ole_objects also
+  # traverses the child setter objects.
   class OLEWrapper
     attr_reader :ole_object
+    attr_accessor :setter
   
     # Set up wrapped object, by passing a WIN32OLE object
     # (or a String with the name of a WIN32OLE server)
-    def initialize(ole_object)
+    # Optionally, pass a +setter+ WIN32OLE object.
+    def initialize(ole_object, setter = nil)
       ole_object = WIN32OLE.new(ole_object) if ole_object.kind_of?(String)
       @ole_object = ole_object
+      @setter = setter
     end
     
     # Return Array of ole_methods for request WIN32OLE object.
@@ -74,7 +84,7 @@ module QBFC
         set_value(symbol.to_s[0..-2], *params)
       elsif symbol.to_s =~ /\A(\w+)_(full_name|id)\Z/ && ref_name($1)
         get_ref_name_or_id(ref_name($1), $2)
-      elsif detect_ole_method?(@ole_object, symbol.to_s.camelize.gsub(/Id/, 'ID'))
+      elsif detect_ole_method?(@ole_object, ole_sym(symbol))
         get_value(symbol, *params)
       elsif detect_ole_method?(@ole_object, (s = symbol.to_s.singularize.camelize + "RetList"))
         setup_array(s)
@@ -87,10 +97,14 @@ module QBFC
     
     # Sets a value by calling OLEMethodName.SetValue(*params)
     def set_value(ole_method_name, *params)
-      obj = @ole_object.send(ole_method_name.to_s.camelize.gsub(/Id/, 'ID'))
+      ole_method_name = ole_sym(ole_method_name)
+      obj = @ole_object.send(ole_method_name)
 
       if detect_ole_method?(obj, "SetValue")
         obj.SetValue(*params)
+        if @setter && detect_ole_method?(@setter, ole_method_name)
+          @setter.send(ole_method_name).SetValue(*params)
+        end
       else
         raise SetValueMissing, "SetValue is expected, but missing, for #{ole_method_name}"
       end
@@ -98,15 +112,24 @@ module QBFC
     
     # Gets a value by calling OLEMethodName.GetValue
     def get_value(ole_method_name, *params)
-      obj = @ole_object.send(ole_method_name.to_s.camelize.gsub(/Id/, 'ID'), *params)
+      ole_method_name = ole_sym(ole_method_name)
+      obj = @ole_object.send(ole_method_name, *params)
       if detect_ole_method?(obj, "GetValue")
-        if ole_method_name.to_s =~ /date/i || ole_method_name.to_s =~ /time/i 
+        if ole_method_name =~ /date/i || ole_method_name.to_s =~ /time/i 
           Time.parse(obj.GetValue)
         else
           obj.GetValue
         end
       else
-        return(obj.kind_of?(WIN32OLE) ? self.class.new(obj) : obj)
+        if obj.kind_of?(WIN32OLE)
+          if @setter && detect_ole_method?(@setter, ole_method_name)
+            self.class.new(obj, @setter.send(ole_method_name, *params))
+          else
+            self.class.new(obj)
+          end
+        else
+          obj
+        end
       end
     end
 
@@ -152,6 +175,11 @@ module QBFC
     # Check if the obj has an ole_method matching the symbol.
     def detect_ole_method?(obj, symbol)
       obj && obj.respond_to?(:ole_methods) && obj.ole_methods.detect{|m| m.to_s == symbol.to_s}
+    end
+    
+    # Helper method to convert 'Ruby-ish' method name to WIN32OLE method name
+    def ole_sym(symbol)
+      symbol.to_s.camelize.gsub(/Id/, 'ID')
     end
   end
 end

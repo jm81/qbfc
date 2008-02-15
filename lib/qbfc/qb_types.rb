@@ -50,4 +50,11 @@ module QBFC
       const_set(:ALLOWS_READ, true)
     end
   end
+  
+  # Set up types with Mod
+  (ELEMENTS_MOD + ELEMENTS_ADD_MOD_QUERY + ELEMENTS_ADD_MOD).uniq.each do | qb_element_name |
+    const_get(qb_element_name).class_eval do
+      const_set(:ALLOWS_UPDATE, true)
+    end
+  end
 end
