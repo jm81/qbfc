@@ -7,6 +7,8 @@ module QBFC
   end
   class UnknownRequestError < RuntimeError#:nodoc:
   end
+  class InvalidRequestError < RuntimeError#:nodoc:
+  end
 end
 
 # Encapsulates a QBFC session.

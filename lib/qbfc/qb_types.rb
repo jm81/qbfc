@@ -62,5 +62,23 @@ module QBFC
     const_get(qb_element_name).class_eval do
       const_set(:ALLOWS_CREATE, true)
     end
-  end  
+  end
+  
+  TXN_DEL_TYPES.each do | qb_element_name |
+    const_get(qb_element_name).class_eval do
+      const_set(:ALLOWS_DELETE, :txn)
+    end
+  end
+  
+  LIST_DEL_TYPES.each do | qb_element_name |
+    const_get(qb_element_name).class_eval do
+      const_set(:ALLOWS_DELETE, :list)
+    end
+  end
+
+  ELEMENT_DEL_TYPES.each do | qb_element_name |
+    const_get(qb_element_name).class_eval do
+      const_set(:ALLOWS_DELETE, :element)
+    end
+  end
 end

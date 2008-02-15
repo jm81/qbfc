@@ -106,7 +106,7 @@ class QBFC::Base
       end
     end
   
-    def find_by_full_name(sess, full_name, options = {})
+    def find_by_full_name(sess, full_name, query_options = {})
       if self.class_name == "Entity"
         q = create_query(sess)
         q.send("ORListQuery").FullNameList.Add(full_name)
@@ -219,6 +219,26 @@ class QBFC::Base
   
   def save
     @setter.submit
+  end
+  
+  def delete
+    if self.class.allows_delete?
+      if self.class::ALLOWS_DELETE == :txn
+        req = QBFC::Request.new(@sess, "TxnDel")
+        req.txn_del_type = self.class.class_name
+        req.txn_id = id
+      elsif self.class::ALLOWS_DELETE == :list
+        req = QBFC::Request.new(@sess, "ListDel")
+        req.list_del_type = QBFC_CONST::const_get("Ldt#{self.class.class_name}")
+        req.list_id = id
+      else
+        raise RuntimeError, "Element requires specific delete process which has not been implemented."
+      end
+      req.submit
+      return true
+    else
+      raise InvalidRequestError, "#{self.class.class_name} does not support delete requests."
+    end
   end
   
   def ole_methods
