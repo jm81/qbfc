@@ -22,6 +22,12 @@ describe QBFC::OLEWrapper do
     @wrapper.ole_methods.should == []
   end
   
+  it "should check if the OLE object responds to a given ole_method" do
+    @ole_object.should_receive("ole_methods").twice.and_return(["FullName", "ListID"])
+    @wrapper.respond_to_ole?(:FullName).should_not be_false
+    @wrapper.respond_to_ole?(:NonMethod).should be_nil
+  end
+  
   it "should make a list responding to GetAt act as an Array" do
     @get_at_object = mock(WIN32OLE)
     @get_at_wrapper = QBFC::OLEWrapper.new(@get_at_object)
