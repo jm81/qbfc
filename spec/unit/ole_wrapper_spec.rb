@@ -141,6 +141,19 @@ describe QBFC::OLEWrapper do
       @wrapper.qbfc_method_missing(@sess, :full_name=, 'Full Name')
     end
 
+    it "should set @setter also when acting as a setter method, if applicable" do
+      @setter = mock(WIN32OLE)
+      @setter.should_receive("ole_methods").and_return(["FullName", "ListID"])
+      @wrapper = QBFC::OLEWrapper.new(@ole_object, @setter)
+
+      @full_name_setter = WIN32OLE.new("QBFC6.QBSessionManager")      
+      @setter.should_receive(:FullName).and_return(@full_name_setter)
+      @full_name.should_receive(:SetValue).with('Full Name')
+      @full_name_setter.should_receive(:SetValue).with('Full Name')
+      
+      @wrapper.qbfc_method_missing(@sess, :full_name=, 'Full Name')
+    end
+
     it "should convert 'Id' to 'ID' in setter" do
       @ole_object.should_receive(:ListID).and_return(@full_name)
       @full_name.should_receive(:SetValue).and_return('{123-456}')
