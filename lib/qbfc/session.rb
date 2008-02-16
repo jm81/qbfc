@@ -32,6 +32,7 @@ end
 # 
 # - session.customers.find(:all) instead of QBFC::Customer.find(session, :all)
 # - session.customer('CustomerFullName') instead of QBFC::Customer.find(session, 'CustomerFullName')
+# - session.customer instead of QBFC::Customer.find(session, :first)
 
 module QBFC
   class Session

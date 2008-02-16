@@ -99,13 +99,19 @@ describe QBFC::Session do
     end
   end
   
-  it "should create an instance of QBFC::Base descendant from a singular method" do
+  it "should create an instance of QBFC::Base descendant from a singular method with params" do
     @base = mock(QBFC::Base)
     QBFC::Customer.should_receive(:find_by_full_name_or_list_id).with(@qb_sess, '1234-5678').and_return(@base)
     @qb_sess.customer('1234-5678').should == @base
     
     QBFC::Vendor.should_receive(:find_by_full_name_or_list_id).with(@qb_sess, '1234-5678').and_return(@base)
     @qb_sess.vendor('1234-5678').should == @base
+  end
+
+  it "should create an instance of QBFC::Base descendant from a singular method" do
+    @base = mock(QBFC::Base)
+    QBFC::Customer.should_receive(:find).with(@qb_sess, :first).and_return(@base)
+    @qb_sess.customer.should == @base
   end
   
   it "should create an instance of QBFC::QBCollection a plural method" do
