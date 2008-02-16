@@ -51,6 +51,19 @@ describe QBFC::Request do
     QBFC::Request.new(@sess, 'CustomerQuery').ole_methods
   end
   
+  it "gives direct access to the request's ole_object" do
+    @ole_request.should_receive(:ole_object).and_return("OLEObject")
+    QBFC::Request.new(@sess, 'CustomerQuery').ole_object.should == "OLEObject"
+  end
+  
+  it "should have the OLEWrapper object handle missing methods" do
+    @ole_request.should_receive(:qbfc_method_missing).with(@sess, :no_method)
+    QBFC::Request.new(@sess, 'CustomerQuery').no_method
+
+    @ole_request.should_receive(:qbfc_method_missing).with(@sess, :NoMethod)
+    QBFC::Request.new(@sess, 'CustomerQuery').NoMethod
+  end
+  
   it "should return xml of the request" do
     @request_set.should_receive(:ToXMLString)
     QBFC::Request.new(@sess, 'CustomerQuery').to_xml

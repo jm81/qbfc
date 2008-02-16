@@ -39,6 +39,7 @@ module QBFC
       end
     end
     
+    # Submit the requests. This returns the full (not wrapped) response object.
     def submit
       @sess.DoRequests(@request_set)
     end
