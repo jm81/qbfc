@@ -1,78 +1,90 @@
 # This file sets up the classes for QuickBooks entities, transactions and reports.
 
-ELEMENTS_ADD_QUERY = %w{ARRefundCreditCard BillPaymentCreditCard BillingRate CustomerMsg CustomerType DateDrivenTerms 
-                        Deposit InventoryAdjustment JobType PaymentMethod PayrollItemWage SalesTaxCode ShipMethod StandardTerms 
-                        ToDo VehicleMileage VendorCredit VendorType} # Remove 'Class'
- 
-ELEMENTS_ADD_MOD_QUERY = %w{Account Bill BillPaymentCheck BuildAssembly Charge Check CreditCardCharge CreditCardCredit
-                            CreditMemo Customer DataExtDef Employee Estimate Invoice ItemDiscount ItemFixedAsset ItemGroup
-                            ItemInventory ItemInventoryAssembly ItemNonInventory ItemOtherCharge ItemPayment ItemReceipt
-                            ItemSalesTax ItemSalesTaxGroup ItemService ItemSubtotal JournalEntry OtherName PriceLevel
-                            PurchaseOrder ReceivePayment SalesOrder SalesReceipt SalesRep TimeTracking Vehicle Vendor}
- 
-ELEMENTS_QUERY = %w{AgingReport BillToPay BudgetSummaryReport Company CompanyActivity CustomDetailReport CustomSummaryReport
-                    DataEventRecoveryInfo Entity GeneralDetailReport GeneralSummaryReport Host ItemAssembliesCanBuild Item
-                    JobReport ListDeleted PayrollDetailReport PayrollItemNonWage PayrollSummaryReport Preferences
-                    ReceivePaymentToDeposit SalesTaxPaymentCheck Template Terms TimeReport Transaction TxnDeleted}
-
-ELEMENTS_ADD = %w{SpecialAccount SpecialItem}
-
-ELEMENTS_MOD = %w{ClearStatus}
-
-ELEMENTS_ADD_MOD = %w{DataExt ListDisplay TxnDisplay}
-
-# TxnDel - Types that can be deleted by a TxnDelRq
-TXN_DEL_TYPES = %w{ARRefundCreditCard Bill BillPaymentCheck BillPaymentCreditCard BuildAssembly Charge Check CreditCardCharge
-                   CreditCardCredit CreditMemo Deposit Estimate InventoryAdjustment Invoice ItemReceipt JournalEntry PurchaseOrder
-                   ReceivePayment SalesOrder SalesReceipt SalesTaxPaymentCheck TimeTracking VehicleMileage VendorCredit}
-
+# TODO: Remember ClearStatusMod for transactions
+# TODO: Remember TxnDisplayAdd and TxnDisplayMod
+QBFC_TXN_TYPES  = %w{ARRefundCreditCard Bill BillPaymentCheck BillPaymentCreditCard BuildAssembly Charge Check CreditCardCharge
+                     CreditCardCredit CreditMemo Deposit Estimate InventoryAdjustment Invoice ItemReceipt JournalEntry PurchaseOrder
+                     ReceivePayment SalesOrder SalesReceipt SalesTaxPaymentCheck TimeTracking VehicleMileage VendorCredit}
+                     
 # TxnVoid - Types that can be voided by a TxnVoidRq
-TXN_VOID_TYPES = %w{ARRefundCreditCard Bill BillPaymentCheck BillPaymentCreditCard Charge Check CreditCardCharge CreditCardCredit
-                    CreditMemo Deposit InventoryAdjustment Invoice ItemReceipt JournalEntry SalesReceipt VendorCredit}
+QBFC_VOID_TYPES = %w{ARRefundCreditCard Bill BillPaymentCheck BillPaymentCreditCard Charge Check CreditCardCharge CreditCardCredit
+                     CreditMemo Deposit InventoryAdjustment Invoice ItemReceipt JournalEntry SalesReceipt VendorCredit}
 
-# ListDel - Types that can be deleted by a ListDelRq
-LIST_DEL_TYPES = %w{Account BillingRate Class Customer CustomerMsg CustomerType DateDrivenTerms Employee ItemDiscount
-                    ItemFixedAsset ItemGroup ItemInventory ItemInventoryAssembly ItemNonInventory ItemOtherCharge
-                    ItemPayment ItemSalesTax ItemSalesTaxGroup ItemService ItemSubtotal JobType OtherName PaymentMethod
-                    PayrollItemNonWage PayrollItemWage PriceLevel SalesRep SalesTaxCode ShipMethod StandardTerms ToDo
-                    Vehicle Vendor VendorType}
+# List types that will inherit directly from QBFC::List
+# TODO: Remember ListDisplayAdd and ListDisplayMod
+QBFC_LIST_TYPES = %w{Account BillingRate QBClass CustomerMsg CustomerType JobType  PaymentMethod
+                     PayrollItemNonWage PayrollItemWage PriceLevel SalesRep SalesTaxCode ShipMethod ToDo
+                     Vehicle VendorType}
 
+# Inherit from List                     
+QBFC_ENTITY_TYPES = %w{Customer Employee OtherName Vendor}
+
+# Inherit from List
+QBFC_ITEM_TYPES = %w{ItemService ItemNonInventory ItemOtherCharge ItemInventory ItemInventoryAssembly ItemFixedAsset
+                     ItemSubtotal ItemDiscount ItemPayment ItemSalesTax ItemSalesTaxGroup ItemGroup}
+
+# Inherit from List
+QBFC_TERMS_TYPES = %w{DateDrivenTerms StandardTerms}
+             
+# List and Transaction types that do not accept Mod Requests       
+QBFC_NO_MOD_TYPES = %w{ARRefundCreditCard BillPaymentCreditCard BillingRate CustomerMsg CustomerType DateDrivenTerms 
+                       Deposit InventoryAdjustment JobType PaymentMethod PayrollItemWage SalesTaxCode ShipMethod StandardTerms 
+                       ToDo VehicleMileage VendorCredit VendorType QBClass}
+
+# Types that allow Query and Delete only
+QBFC_DELETE_ONLY = %w{PayrollItemNonWage DataEventRecoveryInfo}
+
+# Report types support Query requests only and return an itemized list of some sort;
+# sometimes, this includes meta-information about the report (e.g. header)
+QBFC_REPORT_TYPES = %w{AgingReport BillToPay BudgetSummaryReport CustomDetailReport CustomSummaryReport
+                      GeneralDetailReport GeneralSummaryReport 
+                    JobReport ListDeleted PayrollDetailReport PayrollSummaryReport 
+                    ReceivePaymentToDeposit SalesTaxPaymentCheck Template TimeReport TxnDeleted}
+
+# Info Types support Query requests only and return a single entry
+QBFC_INFO_TYPES = %w{Company CompanyActivity Host Preferences ItemAssembliesCanBuild}
+
+# Types that allow Special adds (Pre-defined and normally added automatically by QuickBooks)
+QBFC_HAS_SPECIAL_ADD = %w{Account Item}
+
+# TODO: Here and below arrays I haven't yet formed any approach to dealing with.
+# I leave them here as a reminder.
+ELEMENTS_ADD_MOD = %w{ DataExt }                  
+                    
+ELEMENTS_ADD_MOD_QUERY = %w{ DataExtDef }                    
+                    
 # Types that have their own DelRq
 ELEMENT_DEL_TYPES = %w{DataEventRecoveryInfo DataExt DataExtDef}
 
 module QBFC
   # Create QBElement classes
-  (ELEMENTS_ADD_QUERY + ELEMENTS_ADD_MOD_QUERY + ELEMENTS_QUERY + ELEMENTS_ADD + ELEMENTS_MOD + ELEMENTS_ADD_MOD).uniq.each do | qb_element_name |
+  (QBFC_TXN_TYPES + QBFC_LIST_TYPES + QBFC_ENTITY_TYPES + QBFC_ITEM_TYPES + QBFC_TERMS_TYPES + QBFC_REPORT_TYPES + QBFC_INFO_TYPES + QBFC_DELETE_ONLY + %w{DataExt DataExtDef Entity}).uniq.each do | qb_element_name |
     const_set(qb_element_name, Class.new(Base))
-  end
-  
-  # Set up types with Query
-  (ELEMENTS_ADD_QUERY + ELEMENTS_ADD_MOD_QUERY + ELEMENTS_QUERY).uniq.each do | qb_element_name |
+    
     const_get(qb_element_name).class_eval do
       const_set(:ALLOWS_READ, true)
     end
-  end
-  
-  # Set up types with Mod
-  (ELEMENTS_MOD + ELEMENTS_ADD_MOD_QUERY + ELEMENTS_ADD_MOD).uniq.each do | qb_element_name |
-    const_get(qb_element_name).class_eval do
-      const_set(:ALLOWS_UPDATE, true)
+    
+    unless (QBFC_NO_MOD_TYPES + QBFC_DELETE_ONLY).include?(qb_element_name)
+      const_get(qb_element_name).class_eval do
+        const_set(:ALLOWS_UPDATE, true)
+      end
     end
   end
   
-  (ELEMENTS_ADD + ELEMENTS_ADD_MOD_QUERY + ELEMENTS_ADD_MOD + ELEMENTS_ADD_QUERY).uniq.each do | qb_element_name |
+  (QBFC_TXN_TYPES + QBFC_LIST_TYPES + QBFC_ENTITY_TYPES + QBFC_ITEM_TYPES + QBFC_TERMS_TYPES).uniq.each do | qb_element_name |
     const_get(qb_element_name).class_eval do
       const_set(:ALLOWS_CREATE, true)
     end
   end
   
-  TXN_DEL_TYPES.each do | qb_element_name |
+  QBFC_TXN_TYPES.each do | qb_element_name |
     const_get(qb_element_name).class_eval do
       const_set(:ALLOWS_DELETE, :txn)
     end
   end
   
-  LIST_DEL_TYPES.each do | qb_element_name |
+  (QBFC_LIST_TYPES + QBFC_ENTITY_TYPES + QBFC_ITEM_TYPES + QBFC_TERMS_TYPES).each do | qb_element_name |
     const_get(qb_element_name).class_eval do
       const_set(:ALLOWS_DELETE, :list)
     end
@@ -84,7 +96,7 @@ module QBFC
     end
   end
   
-  TXN_VOID_TYPES.each do | qb_element_name |
+  QBFC_VOID_TYPES.each do | qb_element_name |
     const_get(qb_element_name).class_eval do
       const_set(:ALLOWS_VOID, true)
     end
