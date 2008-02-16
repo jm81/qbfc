@@ -31,9 +31,19 @@ describe QBFC::Request do
     lambda { QBFC::Request.new(@sess, 'CustomerQuery')}.should raise_error(QBFC::QBXMLVersionError)
   end
   
+  it "should re-raise errors other than QBXMLVersionError" do
+    @sess.should_receive(:CreateMsgSetRequest).and_raise(WIN32OLERuntimeError.new('error'))
+    lambda { QBFC::Request.new(@sess, 'CustomerQuery')}.should raise_error(WIN32OLERuntimeError)
+  end
+    
   it "should raise a QBFC::UnknownRequestError if the request is not supported" do
     @request_set.should_receive(:AppendCustomerQueryRq).and_raise(WIN32OLERuntimeError.new('error code:0x80020006'))
     lambda { QBFC::Request.new(@sess, 'CustomerQuery')}.should raise_error(QBFC::UnknownRequestError)
+  end
+    
+  it "should re-raise errors other than UnknownRequestError" do
+    @request_set.should_receive(:AppendCustomerQueryRq).and_raise(WIN32OLERuntimeError.new('error'))
+    lambda { QBFC::Request.new(@sess, 'CustomerQuery')}.should raise_error(WIN32OLERuntimeError)
   end
   
   it "should show ole_methods" do
