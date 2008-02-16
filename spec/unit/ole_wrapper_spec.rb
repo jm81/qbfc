@@ -111,6 +111,23 @@ describe QBFC::OLEWrapper do
       @wrapper.qbfc_method_missing(@sess, :full_name).should == @full_name_wrapper
     end
     
+    it "should wrap @setter if applicable when wrapping WIN32OLE objects returned by getter " do
+      @setter = mock(WIN32OLE)
+      @setter.should_receive("ole_methods").and_return(["FullName", "ListID"])
+      @wrapper = QBFC::OLEWrapper.new(@ole_object, @setter)
+
+      @full_name_getter = WIN32OLE.new("QBFC6.QBSessionManager")
+      @full_name_setter = WIN32OLE.new("QBFC6.QBSessionManager")
+      @ole_object.should_receive(:FullName).and_return(@full_name_getter)
+      @full_name_getter.should_receive(:ole_methods).and_return(['SetValue'])
+      @setter.should_receive(:FullName).and_return(@full_name_setter)
+      
+      @full_name_wrapper = QBFC::OLEWrapper.new(@full_name_getter, @full_name_setter)
+      QBFC::OLEWrapper.should_receive(:new).with(@full_name_getter, @full_name_setter).and_return(@full_name_wrapper)
+      
+      @wrapper.qbfc_method_missing(@sess, :full_name).should == @full_name_wrapper
+    end
+    
     it "should return non-WIN32OLE returned by getter that don't respond to GetValue" do
       @ole_object.should_receive(:FullName).and_return('Full Name')
       @full_name.should_not_receive(:GetValue)
