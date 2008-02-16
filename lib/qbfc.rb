@@ -10,6 +10,7 @@ end
 module QBFC
   class << self
   
+    # Opens and yields a QBFC::Session
     def session(*args, &block)
       QBFC::Session::open(*args, &block)
     end
