@@ -54,7 +54,7 @@ describe QBFC::OLEWrapper do
       @full_name.stub!(:ole_methods).and_return(['GetValue', 'SetValue'])
       
       @ole_object.stub!(:FullName).and_return(@full_name)
-      @ole_object.stub!(:ole_methods).and_return(['FullName', 'LineRetList', 'PayeeEntityRef', 'AccountRef', 'TimeModified', 'ListID'])
+      @ole_object.stub!(:ole_methods).and_return(['FullName', 'LineRetList', 'PayeeEntityRef', 'AccountRef', 'TimeModified', 'ListID', 'ORInvoiceLineRetList'])
     end
     
     it "should call a capitalized method directly" do
@@ -153,6 +153,22 @@ describe QBFC::OLEWrapper do
       
       @wrapper.qbfc_method_missing(@sess, :lines).should ==
         [@full_name_wrapper, @full_name_wrapper]
+    end
+    
+    it "should wrap OR*RetList objects in an Array" do
+      ret_list = mock('WIN32OLE.ORInvoiceLineRetList')
+      list_item_wrapper = mock('WIN32OLE.InvoiceLineRetWrapper')
+      list_item = mock('WIN32OLE.InvoiceLineRet')
+      ret_list.stub!(:ole_methods).and_return(['GetAt', 'Count'])
+      ret_list.should_receive(:Count).and_return(2)
+      ret_list.should_receive(:GetAt).with(0).and_return(list_item_wrapper)
+      ret_list.should_receive(:GetAt).with(1).and_return(list_item_wrapper)
+      list_item_wrapper.should_receive(:InvoiceLineRet).twice.and_return(list_item)
+    
+      @ole_object.should_receive(:ORInvoiceLineRetList).and_return(ret_list)
+      
+      @wrapper.qbfc_method_missing(@sess, :invoice_lines).should ==
+        [list_item, list_item]
     end
     
     it "should have *_full_name for *Ref" do
