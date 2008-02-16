@@ -1,3 +1,5 @@
+# This file sets up the classes for QuickBooks entities, transactions and reports.
+
 ELEMENTS_ADD_QUERY = %w{ARRefundCreditCard BillPaymentCreditCard BillingRate CustomerMsg CustomerType DateDrivenTerms 
                         Deposit InventoryAdjustment JobType PaymentMethod PayrollItemWage SalesTaxCode ShipMethod StandardTerms 
                         ToDo VehicleMileage VendorCredit VendorType} # Remove 'Class'
