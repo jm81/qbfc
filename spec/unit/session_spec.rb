@@ -77,15 +77,11 @@ describe QBFC::Session do
     @qb_sess.close()
   end
   
-  describe "QBFC::Session::open" do
+  describe "::open" do
+    
     before(:each) do
-      @ole_object = mock("WIN32OLE")
-      @ole_object.stub!(:OpenConnection2)
-      @ole_object.stub!(:BeginSession)
-      @ole_object.stub!(:EndSession)
-      @ole_object.stub!(:CloseConnection)
-      
-      WIN32OLE.stub!(:new).and_return(@ole_object)
+      @ole_wrapper.stub!(:EndSession)
+      @ole_wrapper.stub!(:CloseConnection)
     end
   
     it "should accept a block" do
