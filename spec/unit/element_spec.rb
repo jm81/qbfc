@@ -1,17 +1,67 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+module QBFC::ElementTest
+  class BaseKlass < QBFC::Element
+    is_base_class
+  end
+  
+  class NormalKlass < QBFC::Element
+  end
+end
+
 # An Element is a Transaction or a List; that is any QuickBooks objects that can
 # be created, edited (possibly), deleted and read. Contrast to a Report or Info
 # which are read-only.
-# 
-# 
 describe QBFC::Element do
 
   before(:each) do 
     @sess = mock(QBFC::Session)
     @ole_wrapper = mock(QBFC::OLEWrapper)
+    @ole_object = mock(WIN32OLE)
     @ole_methods = ["FullName", "DataExtRetList"]
-    @element = QBFC::Element.new(@sess, @ole_wrapper)
+    @element = QBFC::ElementTest::NormalKlass.new(@sess, @ole_wrapper)
+  end
+
+  describe "#initialize" do
+    it "should set up add request if ole_object is nil" do
+      @request = mock(QBFC::Request)
+      @request.should_receive(:ole_object).and_return(@ole_object)
+      QBFC::Request.should_receive(:new).with(@sess, "NormalKlassAdd").and_return(@request)
+      QBFC::ElementTest::NormalKlass.new(@sess)
+    end
+    
+    it "should error if class is_base_class?" do
+      lambda {
+        QBFC::ElementTest::BaseKlass.new(@sess)
+      }.should raise_error(QBFC::BaseClassNewError)
+
+      lambda {
+        QBFC::ElementTest::BaseKlass.new(@sess, @ole_wrapper)
+      }.should raise_error(QBFC::BaseClassNewError)
+    end
+  end
+  
+  describe "#new_record?" do
+    before(:each) do
+      @request = mock(QBFC::Request)
+      @request.stub!(:ole_object).and_return(@ole_object)
+      QBFC::Request.stub!(:new).with(@sess, "NormalKlassAdd").and_return(@request)
+    end
+    
+    it "should return true if ole_object is an AddRq" do
+      QBFC::ElementTest::NormalKlass.new(@sess).new_record?.should be_true
+    end
+
+    it "should return false if ole_object is from a QueryRq" do
+      @element.new_record?.should be_false
+    end
+  end
+  
+  describe ".is_base_class? (and is_base_class macro)" do
+    it "should return true if Class is_base_class has been called" do
+      QBFC::ElementTest::BaseKlass.is_base_class?.should be_true
+      QBFC::ElementTest::NormalKlass.is_base_class?.should be_false
+    end
   end
   
   describe "#custom" do

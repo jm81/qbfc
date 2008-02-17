@@ -157,12 +157,6 @@ class QBFC::Base
     @sess, @ole = sess, ole    
     @ole = QBFC::OLEWrapper.new(@ole) if @ole.kind_of?(WIN32OLE)
     
-    if @ole.nil?
-      add_rq = QBFC::Request.new(sess, "#{self.class.qb_name}Add")
-      @ole =  QBFC::OLEWrapper.new(add_rq.ole_object)
-      @setter = add_rq
-    end
-    
     if self.class.allows_update? && ole
       mod = QBFC::Request.new(sess, "#{self.class.qb_name}Mod")
           
