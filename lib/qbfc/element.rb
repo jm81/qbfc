@@ -61,6 +61,6 @@ module QBFC
 end
 
 # Require subclass files
-%w{ list }.each do |file|
+%w{ list transaction }.each do |file|
   require File.dirname(__FILE__) + '/' + file
 end
