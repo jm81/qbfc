@@ -11,6 +11,8 @@ module QBFC
   end
   class BaseClassNewError < RuntimeError#:nodoc:
   end
+  class NotSavableError < RuntimeError#:nodoc:
+  end
 end
 
 # Encapsulates a QBFC session.

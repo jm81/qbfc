@@ -193,10 +193,6 @@ class QBFC::Base
     end
   end
   
-  def save
-    @setter.submit
-  end
-  
   def delete
     # Will be reimplemented within Subclasses (List and Transaction)
     if false && self.class.allows_delete?

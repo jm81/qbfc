@@ -30,6 +30,14 @@ describe QBFC::Element do
       QBFC::ElementTest::NormalKlass.new(@sess)
     end
     
+    it "should assign the Add request as the @setter" do
+      @request = mock(QBFC::Request)
+      @request.stub!(:ole_object).and_return(@ole_object)
+      QBFC::Request.should_receive(:new).with(@sess, "NormalKlassAdd").and_return(@request)
+      QBFC::ElementTest::NormalKlass.new(@sess).
+          instance_variable_get(:@setter).should == @request
+    end
+    
     it "should error if class is_base_class?" do
       lambda {
         QBFC::ElementTest::BaseKlass.new(@sess)
@@ -90,6 +98,21 @@ describe QBFC::Element do
       @data_ext.should_receive(:data_ext_name).twice.and_return("Custom Field")
       
       @element.custom("No Field").should be_nil
+    end
+  end
+  
+  describe "#save" do
+    it "should submit the setter object" do
+      @request = mock(QBFC::Request)
+      @request.stub!(:ole_object).and_return(@ole_object)
+      QBFC::Request.should_receive(:new).with(@sess, "NormalKlassAdd").and_return(@request)
+      @request.should_receive(:submit)
+
+      QBFC::ElementTest::NormalKlass.new(@sess).save
+    end
+    
+    it "should raise an error if there is no setter object" do
+      lambda { @element.save}.should raise_error(QBFC::NotSavableError)
     end
   end
 end

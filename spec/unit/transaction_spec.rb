@@ -52,12 +52,4 @@ describe QBFC::Transaction do
   describe "#delete" do
     it "should setup a TxnDelRq with Txn Type and ID"
   end
-  
-  describe "#save" do
-    it "should create the new record"
-  end
-  
-  describe "#create" do
-    it "should submit the request object"
-  end
 end

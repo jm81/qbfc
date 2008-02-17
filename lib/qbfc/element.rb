@@ -36,6 +36,7 @@ module QBFC
         add_rq = QBFC::Request.new(sess, "#{qb_name}Add")
         @ole = QBFC::OLEWrapper.new(add_rq.ole_object)
         @new_record = true
+        @setter = add_rq
       end
     end
     
@@ -55,6 +56,15 @@ module QBFC
       end
       
       return nil
+    end
+    
+    # Save (create or update) this record
+    def save
+      if @setter
+        @setter.submit
+      else
+        raise NotSavableError, "This record cannot be saved (Probably because it does not support Mod Requests)."
+      end
     end
     
   end
