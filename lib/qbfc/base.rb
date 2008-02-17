@@ -1,31 +1,10 @@
 class QBFC::Base
   class << self
 
-    # Does this class support read operations,
-    # i.e. does QBFC support a Query request for this type?
-    # Notably, this means that the full finder is enabled
-    # (see +find+ for details).
-    def allows_read?
-      self.const_defined?(:ALLOWS_READ) ? self::ALLOWS_READ : false
-    end
-
-    # Does this class support create operations,
-    # i.e. does QBFC support an Add request for this type?
-    def allows_create?
-      self.const_defined?(:ALLOWS_CREATE) ? self::ALLOWS_CREATE : false
-    end
-
     # Does this class support update operations,
     # i.e. does QBFC support an Modify request for this type?
     def allows_update?
       self.const_defined?(:ALLOWS_UPDATE) ? self::ALLOWS_UPDATE : false
-    end
-
-    # Does this class support delete operations,
-    # i.e. is this class supported by QBFC's TxnDel or ListDel or
-    # have its own Del request.
-    def allows_delete?
-      self.const_defined?(:ALLOWS_DELETE) ? self::ALLOWS_DELETE : false
     end
     
     # Does this class support void operations,
@@ -34,16 +13,7 @@ class QBFC::Base
       self.const_defined?(:ALLOWS_VOID) ? self::ALLOWS_VOID : false
     end
   
-    def find(sess, *args)
-      if !allows_read?
-        if (hsh = args.last) && hsh.kind_of?(Hash) && 
-            (hsh[:list_id] || hsh[:full_name] || hsh[:name])
-          return new(sess, hsh)
-        else
-          raise RuntimeError, "Find for non-readable class '#{class_name}' requires a name or list_id"
-        end
-      end
-          
+    def find(sess, *args)         
       if args[0].kind_of?(String) # Single FullName or ListID
         find_by_full_name_or_list_id(sess, args[0])
       else
@@ -238,7 +208,8 @@ class QBFC::Base
   end
   
   def delete
-    if self.class.allows_delete?
+    # Will be reimplemented within Subclasses (List and Transaction)
+    if false && self.class.allows_delete?
       if self.class::ALLOWS_DELETE == :txn
         req = QBFC::Request.new(@sess, "TxnDel")
         req.txn_del_type = QBFC_CONST::const_get("Tdt#{self.class.class_name}")

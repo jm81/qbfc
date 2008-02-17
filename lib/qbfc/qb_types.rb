@@ -60,42 +60,14 @@ module QBFC
   # Create QBElement classes
   (QBFC_TXN_TYPES + QBFC_LIST_TYPES + QBFC_ENTITY_TYPES + QBFC_ITEM_TYPES + QBFC_TERMS_TYPES + QBFC_REPORT_TYPES + QBFC_INFO_TYPES + QBFC_DELETE_ONLY + %w{DataExt DataExtDef Entity}).uniq.each do | qb_element_name |
     const_set(qb_element_name, Class.new(Base))
-    
-    const_get(qb_element_name).class_eval do
-      const_set(:ALLOWS_READ, true)
-    end
-    
+        
     unless (QBFC_NO_MOD_TYPES + QBFC_DELETE_ONLY).include?(qb_element_name)
       const_get(qb_element_name).class_eval do
         const_set(:ALLOWS_UPDATE, true)
       end
     end
   end
-  
-  (QBFC_TXN_TYPES + QBFC_LIST_TYPES + QBFC_ENTITY_TYPES + QBFC_ITEM_TYPES + QBFC_TERMS_TYPES).uniq.each do | qb_element_name |
-    const_get(qb_element_name).class_eval do
-      const_set(:ALLOWS_CREATE, true)
-    end
-  end
-  
-  QBFC_TXN_TYPES.each do | qb_element_name |
-    const_get(qb_element_name).class_eval do
-      const_set(:ALLOWS_DELETE, :txn)
-    end
-  end
-  
-  (QBFC_LIST_TYPES + QBFC_ENTITY_TYPES + QBFC_ITEM_TYPES + QBFC_TERMS_TYPES).each do | qb_element_name |
-    const_get(qb_element_name).class_eval do
-      const_set(:ALLOWS_DELETE, :list)
-    end
-  end
-
-  ELEMENT_DEL_TYPES.each do | qb_element_name |
-    const_get(qb_element_name).class_eval do
-      const_set(:ALLOWS_DELETE, :element)
-    end
-  end
-  
+    
   QBFC_VOID_TYPES.each do | qb_element_name |
     const_get(qb_element_name).class_eval do
       const_set(:ALLOWS_VOID, true)

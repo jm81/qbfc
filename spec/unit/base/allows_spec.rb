@@ -1,21 +1,9 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 # define some classes that inherit from Base with different "ALLOWS_*" constants
-module QBFCSpec
-  class Create < QBFC::Base
-    ALLOWS_CREATE = true
-  end
-
-  class Read < QBFC::Base
-    ALLOWS_READ = true
-  end
-  
+module QBFCSpec  
   class Update < QBFC::Base
     ALLOWS_UPDATE = true
-  end
-  
-  class Delete < QBFC::Base
-    ALLOWS_DELETE = true
   end
   
   class Void < QBFC::Base
@@ -24,25 +12,10 @@ module QBFCSpec
 end
 
 describe "QBFC::Base::allows_*" do
-  
-  it "should specify if it allows create operations" do
-    QBFC::Base::allows_create?.should be_false
-    QBFCSpec::Create::allows_create?.should be_true
-  end
-
-  it "should specify if it allows read operations" do
-    QBFC::Base::allows_read?.should be_false
-    QBFCSpec::Read::allows_read?.should be_true
-  end
-  
+    
   it "should specify if it allows update operations" do
     QBFC::Base::allows_update?.should be_false
     QBFCSpec::Update::allows_update?.should be_true
-  end
-  
-  it "should specify if it allows delete operations" do
-    QBFC::Base::allows_delete?.should be_false
-    QBFCSpec::Delete::allows_delete?.should be_true
   end
   
   it "should specify if it allows void operations" do
