@@ -199,15 +199,6 @@ class QBFC::Base
     end
   end
   
-  # Access custom fields
-  def custom(field_name, owner_id = 0)
-    return nil unless @ole.DataExtRetList
-    @ole.data_ext.each do |field|
-      return field.data_ext_value if field.data_ext_name == field_name
-    end
-    return nil
-  end
-  
   def save
     @setter.submit
   end
