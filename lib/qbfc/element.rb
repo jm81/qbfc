@@ -1,3 +1,5 @@
+require File.dirname(__FILE__) + '/modifiable'
+
 module QBFC
 
   # An Element is a Transaction or a List; that is any QuickBooks objects that can
