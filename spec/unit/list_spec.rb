@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 module QBFC::Test
   class List < QBFC::List
-    def qb_name
+    def self.qb_name
       "Account"
     end
   end
@@ -37,9 +37,47 @@ describe QBFC::List do
     end  
   end
   
-  describe ".find_by_name" do
-    it "should set up Request, specifying FullNameList"
-    it "should process Request"
+  describe ".find_by_name" do    
+    before(:each) do 
+      @request = mock("QBFC::Request")
+      @list_query = mock("QBFC::OLEWrapper#list_query")
+      @full_name_list = mock("QBFC::OLEWrapper#full_name_list")
+      @response = mock("QBFC::Request#response")
+    end
+  
+    def setup_request
+      QBFC::Request.should_receive(:new).with(@sess, 'AccountQuery').and_return(@request)
+      @request.should_receive(:kind_of?).with(QBFC::Request).and_return(true)
+      @request.should_receive(:kind_of?).with(Hash).and_return(false)
+      @request.should_receive(:ORAccountListQuery).and_return(@list_query)
+      @list_query.should_receive(:FullNameList).and_return(@full_name_list)
+      @full_name_list.should_receive(:Add).with("Bob Customer")
+      @request.should_receive(:response).and_return(@response)
+      @response.stub!(:GetAt).with(0).and_return(@ole_wrapper)
+      @response.stub!(:ole_methods).and_return(["GetAt"])
+    end
+  
+    it "should set up Request, specifying FullNameList" do
+      setup_request
+      QBFC::Test::List.find_by_name(@sess, "Bob Customer")
+    end
+  
+    it "should return a List object" do
+      setup_request
+      list = QBFC::Test::List.find_by_name(@sess, "Bob Customer")
+      list.should be_kind_of(QBFC::Test::List)
+    end
+  
+    it "should return nil if none found" do
+      setup_request
+      @response.should_receive(:GetAt).with(0).and_return(nil)
+      QBFC::Test::List.find_by_name(@sess, "Bob Customer").should be_nil
+    end
+    
+    it "should alias as find_by_full_name" do
+      setup_request
+      QBFC::Test::List.find_by_full_name(@sess, "Bob Customer")
+    end
   end
   
   describe ".find_by_id" do

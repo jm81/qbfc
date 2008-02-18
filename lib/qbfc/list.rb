@@ -6,6 +6,17 @@ module QBFC
   class List < Element
     is_base_class
     
+    class << self
+      
+      def find_by_name(sess, full_name, query_options = {})
+        q = create_query(sess, query_options)
+        q.send(self.list_query).FullNameList.Add(full_name)
+        find(sess, :first, q)
+      end
+      
+      alias_method :find_by_full_name, :find_by_name
+    end
+    
     # Alias of ListID for this record. This is a unique within each type of List.
     def id
       @ole.list_id

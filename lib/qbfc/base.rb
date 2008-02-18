@@ -11,8 +11,12 @@ class QBFC::Base
       if args[0].kind_of?(String) # Single FullName or ListID
         find_by_full_name_or_list_id(sess, args[0])
       else
-      
-        q = create_query(sess)
+        
+        if args[1].kind_of?(QBFC::Request)
+          q = args[1]
+        else
+          q = create_query(sess)
+        end
         
         options = args[-1]
         if options.kind_of? Hash
@@ -44,8 +48,6 @@ class QBFC::Base
           options.each do |key, value|
             q.send(key.to_s.camelize).SetValue(value)
           end
-        elsif options.kind_of? QBFC::Request
-          q = options
         end
         
         list = q.response
@@ -60,7 +62,8 @@ class QBFC::Base
           ary
         else
           if list.ole_methods.detect{|m| m.to_s == "GetAt"}
-            return new(sess, list.GetAt(0))
+            item = list.GetAt(0)
+            return( item ? new(sess, item) : nil )
           else
             return new(sess, list)
           end
@@ -85,20 +88,6 @@ class QBFC::Base
         new(sess, q.response[0])
       end
     end
-  
-    def find_by_full_name(sess, full_name, query_options = {})
-      if self.qb_name == "Entity"
-        q = create_query(sess)
-        q.send("ORListQuery").FullNameList.Add(full_name)
-        create_entity(sess, q.response[0], query_options)
-      else
-        q = create_query(sess, query_options)
-        q.send(self.list_query).FullNameList.Add(full_name)
-        new(sess, q.response[0])
-      end
-    end
-    
-    alias_method :find_by_name, :find_by_full_name
     
     def list_query
       if self.qb_name == "Employee" || self.qb_name == "OtherName"
