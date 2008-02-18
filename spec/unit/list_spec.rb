@@ -61,8 +61,20 @@ describe QBFC::List do
   end
   
   describe "#full_name" do
-    it "aliases name if not defined by OLE object"
-    it "calls OLE object's FullName method if defined"
+    before(:each) do
+      @ole_wrapper.stub!(:full_name).and_return("Full Name")
+      @ole_wrapper.stub!(:name).and_return("Short Name")
+    end
+    
+    it "aliases name if not defined by OLE object" do
+       @ole_wrapper.should_receive(:respond_to_ole?).with("FullName").and_return(false)
+       @list.full_name.should == "Short Name"
+    end
+    
+    it "calls OLE object's FullName method if defined" do
+       @ole_wrapper.should_receive(:respond_to_ole?).with("FullName").and_return(true)
+       @list.full_name.should == "Full Name"    
+    end
   end
   
   describe "#delete" do

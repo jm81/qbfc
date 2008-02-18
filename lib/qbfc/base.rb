@@ -168,14 +168,6 @@ class QBFC::Base
     
   end
   
-  # If an entity has a Name field but not a FullName field,
-  # use Name (which, by implication, is the FullName)
-  def full_name
-    @ole.ole_methods.detect{|m| m.to_s == "FullName"} ?
-      @ole.FullName.GetValue :
-      @ole.Name.GetValue
-  end
-  
   # List the methods of the OLE object
   def ole_methods
     @ole.ole_methods

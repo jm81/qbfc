@@ -11,6 +11,14 @@ module QBFC
       @ole.list_id
     end
     
+    # If an entity has a Name field but not a FullName field,
+    # use Name (which, by implication, is the FullName)
+    def full_name
+      respond_to_ole?("FullName") ?
+        @ole.full_name :
+        @ole.name
+    end
+    
     # Delete this List record.
     def delete
       req = QBFC::Request.new(@sess, "ListDel")
