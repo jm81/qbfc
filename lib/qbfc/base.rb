@@ -6,12 +6,6 @@ class QBFC::Base
     def allows_update?
       self.const_defined?(:ALLOWS_UPDATE) ? self::ALLOWS_UPDATE : false
     end
-    
-    # Does this class support void operations,
-    # i.e. is this class supported by QBFC's TxnVoid request
-    def allows_void?
-      self.const_defined?(:ALLOWS_VOID) ? self::ALLOWS_VOID : false
-    end
   
     def find(sess, *args)         
       if args[0].kind_of?(String) # Single FullName or ListID
@@ -180,18 +174,6 @@ class QBFC::Base
     @ole.ole_methods.detect{|m| m.to_s == "FullName"} ?
       @ole.FullName.GetValue :
       @ole.Name.GetValue
-  end
-  
-  def void
-    if self.class.allows_void?
-      req = QBFC::Request.new(@sess, "TxnVoid")
-      req.txn_void_type = QBFC_CONST::const_get("Tvt#{self.class.qb_name}")
-      req.txn_id = id
-      req.submit
-      return true
-    else
-      raise InvalidRequestError, "#{self.class.qb_name} does not support void requests."
-    end
   end
   
   # List the methods of the OLE object
