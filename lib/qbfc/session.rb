@@ -7,8 +7,6 @@ module QBFC
   end
   class UnknownRequestError < RuntimeError#:nodoc:
   end
-  class InvalidRequestError < RuntimeError#:nodoc:
-  end
   class BaseClassNewError < RuntimeError#:nodoc:
   end
   class NotSavableError < RuntimeError#:nodoc:
