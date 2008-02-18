@@ -1,7 +1,6 @@
 # This file sets up the classes for QuickBooks entities, transactions and reports.
 
 # TODO: Remember ClearStatusMod for transactions
-# TODO: Remember TxnDisplayAdd and TxnDisplayMod
 QBFC_TXN_TYPES  = %w{ARRefundCreditCard Bill BillPaymentCheck BillPaymentCreditCard BuildAssembly Charge Check CreditCardCharge
                      CreditCardCredit CreditMemo Deposit Estimate InventoryAdjustment Invoice ItemReceipt JournalEntry PurchaseOrder
                      ReceivePayment SalesOrder SalesReceipt SalesTaxPaymentCheck TimeTracking VehicleMileage VendorCredit}
@@ -11,7 +10,6 @@ QBFC_VOID_TYPES = %w{ARRefundCreditCard Bill BillPaymentCheck BillPaymentCreditC
                      CreditMemo Deposit InventoryAdjustment Invoice ItemReceipt JournalEntry SalesReceipt VendorCredit}
 
 # List types that will inherit directly from QBFC::List
-# TODO: Remember ListDisplayAdd and ListDisplayMod
 QBFC_LIST_TYPES = %w{Account BillingRate QBClass CustomerMsg CustomerType JobType  PaymentMethod
                      PayrollItemNonWage PayrollItemWage PriceLevel SalesRep SalesTaxCode ShipMethod ToDo
                      Vehicle VendorType}

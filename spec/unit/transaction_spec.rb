@@ -70,4 +70,8 @@ describe QBFC::Transaction do
     end
   end
   
+  describe "#display" do
+    it "should call TxnDisplayAdd for new records"
+    it "should call TxnDisplayMod for existing records"
+  end
 end

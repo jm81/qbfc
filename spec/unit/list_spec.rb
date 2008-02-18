@@ -76,4 +76,9 @@ describe QBFC::List do
       @list.delete.should be_true
     end
   end
+  
+  describe "#display" do
+    it "should call ListDisplayAdd for new records"
+    it "should call ListDisplayMod for existing records"
+  end
 end
