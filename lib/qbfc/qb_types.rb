@@ -1,6 +1,5 @@
 # This file sets up the classes for QuickBooks entities, transactions and reports.
 
-# TODO: Remember ClearStatusMod for transactions
 QBFC_TXN_TYPES  = %w{ARRefundCreditCard Bill BillPaymentCheck BillPaymentCreditCard BuildAssembly Charge Check CreditCardCharge
                      CreditCardCredit CreditMemo Deposit Estimate InventoryAdjustment Invoice ItemReceipt JournalEntry PurchaseOrder
                      ReceivePayment SalesOrder SalesReceipt SalesTaxPaymentCheck TimeTracking VehicleMileage VendorCredit}

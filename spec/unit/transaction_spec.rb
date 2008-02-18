@@ -74,4 +74,10 @@ describe QBFC::Transaction do
     it "should call TxnDisplayAdd for new records"
     it "should call TxnDisplayMod for existing records"
   end
+  
+  describe "#cleared_status=" do
+    it "should accept true for CsCleared"
+    it "should accept false for CsNotCleared"
+    it "should submit a ClearedStatusModRq"
+  end
 end
