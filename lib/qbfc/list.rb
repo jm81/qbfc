@@ -10,5 +10,14 @@ module QBFC
     def id
       @ole.list_id
     end
+    
+    # Delete this List record.
+    def delete
+      req = QBFC::Request.new(@sess, "ListDel")
+      req.list_del_type = QBFC_CONST::const_get("Ldt#{qb_name}")
+      req.list_id = id
+      req.submit
+      return true
+    end    
   end
 end

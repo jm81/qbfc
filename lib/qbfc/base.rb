@@ -182,27 +182,6 @@ class QBFC::Base
       @ole.Name.GetValue
   end
   
-  def delete
-    # Will be reimplemented within Subclasses (List and Transaction)
-    if false && self.class.allows_delete?
-      if self.class::ALLOWS_DELETE == :txn
-        req = QBFC::Request.new(@sess, "TxnDel")
-        req.txn_del_type = QBFC_CONST::const_get("Tdt#{self.class.qb_name}")
-        req.txn_id = id
-      elsif self.class::ALLOWS_DELETE == :list
-        req = QBFC::Request.new(@sess, "ListDel")
-        req.list_del_type = QBFC_CONST::const_get("Ldt#{self.class.qb_name}")
-        req.list_id = id
-      else
-        raise RuntimeError, "Element requires specific delete process which has not been implemented."
-      end
-      req.submit
-      return true
-    else
-      raise InvalidRequestError, "#{self.class.qb_name} does not support delete requests."
-    end
-  end
-  
   def void
     if self.class.allows_void?
       req = QBFC::Request.new(@sess, "TxnVoid")

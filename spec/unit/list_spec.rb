@@ -2,6 +2,9 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 module QBFC::Test
   class List < QBFC::List
+    def qb_name
+      "Account"
+    end
   end
 end
 
@@ -63,6 +66,14 @@ describe QBFC::List do
   end
   
   describe "#delete" do
-    it "should setup a ListDelRq with List Type and ID"
+    it "should setup a ListDelRq with List Type and ID" do
+      @del_rq = mock(QBFC::Request)
+      @ole_wrapper.should_receive(:list_id).and_return('{123-456}')
+      QBFC::Request.should_receive(:new).with(@sess, "ListDel").and_return(@del_rq)
+      @del_rq.should_receive(:list_del_type=).with(QBFC_CONST::const_get("LdtAccount"))
+      @del_rq.should_receive(:list_id=).with("{123-456}")
+      @del_rq.should_receive(:submit)
+      @list.delete.should be_true
+    end
   end
 end
