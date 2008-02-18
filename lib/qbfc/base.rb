@@ -182,17 +182,6 @@ class QBFC::Base
       @ole.Name.GetValue
   end
   
-  # Get ListID or TxnID.
-  def id
-    if respond_to_ole?(:ListID)
-      @ole.list_id
-    elsif respond_to_ole?(:TxnID)
-      @ole.txn_id
-    else
-      nil
-    end
-  end
-  
   def delete
     # Will be reimplemented within Subclasses (List and Transaction)
     if false && self.class.allows_delete?

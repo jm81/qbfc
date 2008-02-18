@@ -1,11 +1,16 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+module QBFC::Test
+  class List < QBFC::List
+  end
+end
+
 describe QBFC::List do
 
   before(:each) do 
     @sess = mock(QBFC::Session)
     @ole_wrapper = mock(QBFC::OLEWrapper)
-    @list = QBFC::List.new(@sess, @ole_wrapper)
+    @list = QBFC::Test::List.new(@sess, @ole_wrapper)
   end
   
   it "should specify if it is a superclass_list (such as Entity)"
@@ -46,7 +51,10 @@ describe QBFC::List do
   end
   
   describe "#id" do
-    it "is an alias of list_id"
+    it "is an alias of list_id" do
+      @ole_wrapper.should_receive(:list_id).and_return('L123')
+      @list.id.should == 'L123'
+    end
   end
   
   describe "#full_name" do

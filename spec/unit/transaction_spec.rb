@@ -1,14 +1,17 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+module QBFC::Test
+  class Txn < QBFC::Transaction
+  end
+end
+
 describe QBFC::Transaction do
 
   before(:each) do 
     @sess = mock(QBFC::Session)
     @ole_wrapper = mock(QBFC::OLEWrapper)
-    @txn = QBFC::Transaction.new(@sess, @ole_wrapper)
+    @txn = QBFC::Test::Txn.new(@sess, @ole_wrapper)
   end
-  
-  it "should specify if it is a superclass_list (such as Entity)"
 
   describe ".find" do
     it "should find_by_ref_or_id if the first argument is neither :all nor :first"
@@ -46,7 +49,10 @@ describe QBFC::Transaction do
   end
   
   describe "#id" do
-    it "is an alias of txn_id"
+    it "is an alias of txn_id" do
+      @ole_wrapper.should_receive(:txn_id).and_return('T123')
+      @txn.id.should == 'T123'
+    end
   end
     
   describe "#delete" do
