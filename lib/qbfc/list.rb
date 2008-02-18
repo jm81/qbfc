@@ -8,13 +8,24 @@ module QBFC
     
     class << self
       
-      def find_by_name(sess, full_name, query_options = {})
-        q = create_query(sess, query_options)
+      # Find by name (actually, FullName) of List record.
+      # +options+ are the same as those for in +find+.
+      def find_by_name(sess, full_name, options = {})
+        q = create_query(sess)
         q.send(self.list_query).FullNameList.Add(full_name)
-        find(sess, :first, q)
+        find(sess, :first, q, options)
       end
       
       alias_method :find_by_full_name, :find_by_name
+
+      # Find by ListID of List record.
+      # +options+ are the same as those for in +find+.      
+      def find_by_id(sess, id, options = {})
+        q = create_query(sess)
+        q.send(self.list_query).ListIDList.Add(id)
+        find(sess, :first, q, options)
+      end
+      
     end
     
     # Alias of ListID for this record. This is a unique within each type of List.

@@ -45,6 +45,12 @@ class QBFC::Base
             
             options.delete(:conditions)
           end
+          
+          if options[:owner_id]
+            q.OwnerIDList.Add(query_options[:owner_id])
+            options.delete(:owner_id)
+          end
+          
           options.each do |key, value|
             q.send(key.to_s.camelize).SetValue(value)
           end
@@ -77,18 +83,6 @@ class QBFC::Base
         find_by_full_name(sess, id, query_options)
     end
     
-    def find_by_list_id(sess, list_id, query_options = {})
-      if self.qb_name == "Entity"
-        q = create_query(sess)
-        q.send("ORListQuery").ListIDList.Add(list_id)
-        create_entity(sess, q.response[0], query_options)
-      else
-        q = create_query(sess, query_options)
-        q.send(self.list_query).ListIDList.Add(list_id)
-        new(sess, q.response[0])
-      end
-    end
-    
     def list_query
       if self.qb_name == "Employee" || self.qb_name == "OtherName"
         "ORListQuery"
@@ -97,12 +91,8 @@ class QBFC::Base
       end
     end
     
-    def create_query(sess, query_options = {})
-      q = QBFC::Request.new(sess, "#{self.qb_name}Query")
-      if query_options[:owner_id]
-        q.OwnerIDList.Add(query_options[:owner_id]) 
-      end
-      q
+    def create_query(sess)
+      QBFC::Request.new(sess, "#{self.qb_name}Query")
     end
     
     def create_entity(sess, r, query_options = {})
