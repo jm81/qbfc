@@ -1,5 +1,5 @@
 module QBFC
-  class Modifiable
+  module Modifiable
   
   end
 end

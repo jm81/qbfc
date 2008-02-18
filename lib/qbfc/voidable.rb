@@ -1,5 +1,5 @@
 module QBFC
-  class Voidable
+  module Voidable
   
   end
 end
