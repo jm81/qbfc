@@ -19,3 +19,8 @@ module QBFC
     end
   end
 end
+
+# Require subclass files
+Dir[File.dirname(__FILE__) + '/transactions/*.rb'].each do |file|
+  require file
+end
