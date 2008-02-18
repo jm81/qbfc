@@ -11,14 +11,14 @@ task :default => :spec
 desc "Run all specs in spec/unit directory"
 Spec::Rake::SpecTask.new(:spec) do |t|
   t.spec_opts = ['--options', "\"#{QBFC_ROOT}/spec/spec.opts\""]
-  t.spec_files = FileList['spec/unit/*_spec.rb']
+  t.spec_files = FileList['spec/unit/**/*_spec.rb']
 end
 
 namespace :spec do
   desc "Run all specs in spec/unit directory with RCov"
   Spec::Rake::SpecTask.new(:rcov) do |t|
     t.spec_opts = ['--options', "\"#{QBFC_ROOT}/spec/spec.opts\""]
-    t.spec_files = FileList['spec/unit/*_spec.rb']
+    t.spec_files = FileList['spec/unit/**/*_spec.rb']
     t.rcov = true
     t.rcov_opts = lambda do
       IO.readlines("#{QBFC_ROOT}/spec/rcov.opts").map {|l| l.chomp.split " "}.flatten
@@ -28,13 +28,13 @@ namespace :spec do
   desc "Run all specs in spec/integration directory"
   Spec::Rake::SpecTask.new(:integration) do |t|
     t.spec_opts = ['--options', "\"#{QBFC_ROOT}/spec/spec.opts\""]
-    t.spec_files = FileList['spec/integration/*_spec.rb']
+    t.spec_files = FileList['spec/integration/**/*_spec.rb']
   end
 
   desc "Run all specs in spec/integration directory with RCov"
   Spec::Rake::SpecTask.new(:integration_rcov) do |t|
     t.spec_opts = ['--options', "\"#{QBFC_ROOT}/spec/spec.opts\""]
-    t.spec_files = FileList['spec/integration/*_spec.rb']
+    t.spec_files = FileList['spec/integration/**/*_spec.rb']
     t.rcov = true
     t.rcov_opts = lambda do
       IO.readlines("#{QBFC_ROOT}/spec/rcov.opts").map {|l| l.chomp.split " "}.flatten
