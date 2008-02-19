@@ -5,10 +5,6 @@ module QBFC
       PayrollItemNonWage PayrollItemWage PriceLevel SalesRep SalesTaxCode ShipMethod ToDo
       Vehicle VendorType}
   
-  # Generated Item Types (Inherit from List)
-  ITEM_TYPES = %w{ItemService ItemNonInventory ItemOtherCharge ItemInventory ItemInventoryAssembly ItemFixedAsset
-      ItemSubtotal ItemDiscount ItemPayment ItemSalesTax ItemSalesTaxGroup ItemGroup}
-  
    # Generated Terms Types (Inherit from List)
   TERMS_TYPES = %w{DateDrivenTerms StandardTerms}
              
@@ -16,7 +12,7 @@ module QBFC
   LIST_NO_MOD_TYPES = %w{ BillingRate CustomerMsg CustomerType DateDrivenTerms JobType PaymentMethod
       PayrollItemWage SalesTaxCode ShipMethod StandardTerms ToDo VendorType QBClass}
 
-  ALL_LIST_TYPES = LIST_TYPES + ITEM_TYPES + TERMS_TYPES
+  ALL_LIST_TYPES = LIST_TYPES + TERMS_TYPES
   
   # Generate List subclasses
   generate(ALL_LIST_TYPES, List, {Modifiable => ALL_LIST_TYPES - LIST_NO_MOD_TYPES})
