@@ -14,6 +14,22 @@ module QBFC
     def session(*args, &block)
       QBFC::Session::open(*args, &block)
     end
+  
+    # Generate classes.
+    # - +names+: Array of class names.
+    # - +superclass+: Superclass of classes to be generated.
+    # - +includes+: hash of Module => names of classes to include this module.
+    def generate(names, superclass, include_modules)
+      names.each do | class_name |
+        const_set(class_name, Class.new(superclass))
+      end
+      
+      include_modules.each do | mod, classes |
+        classes.each do | class_name |
+          const_get(class_name).__send__(:include, mod)
+        end
+      end
+    end
     
   end
 end

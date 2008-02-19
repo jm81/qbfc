@@ -51,3 +51,8 @@ module QBFC
     end    
   end
 end
+
+# Require subclass files
+Dir[File.dirname(__FILE__) + '/lists/*.rb'].each do |file|
+  require file
+end

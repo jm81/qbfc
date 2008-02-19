@@ -1,25 +1,5 @@
 # This file sets up the classes for QuickBooks entities, transactions and reports.
 
-# List types that will inherit directly from QBFC::List
-QBFC_LIST_TYPES = %w{Account BillingRate QBClass CustomerMsg CustomerType JobType  PaymentMethod
-                     PayrollItemNonWage PayrollItemWage PriceLevel SalesRep SalesTaxCode ShipMethod ToDo
-                     Vehicle VendorType}
-
-# Inherit from List                     
-QBFC_ENTITY_TYPES = %w{Customer Employee OtherName Vendor}
-
-# Inherit from List
-QBFC_ITEM_TYPES = %w{ItemService ItemNonInventory ItemOtherCharge ItemInventory ItemInventoryAssembly ItemFixedAsset
-                     ItemSubtotal ItemDiscount ItemPayment ItemSalesTax ItemSalesTaxGroup ItemGroup}
-
-# Inherit from List
-QBFC_TERMS_TYPES = %w{DateDrivenTerms StandardTerms}
-             
-# List types that do not accept Mod Requests
-QBFC_LIST_NO_MOD_TYPES = %w{ BillingRate CustomerMsg CustomerType DateDrivenTerms 
-                             JobType PaymentMethod PayrollItemWage SalesTaxCode ShipMethod StandardTerms 
-                             ToDo VendorType QBClass}
-
 # Types that allow Query and Delete only
 QBFC_DELETE_ONLY = %w{PayrollItemNonWage DataEventRecoveryInfo}
 
@@ -51,13 +31,7 @@ QBFC_ANOTHER_TO_INTEGRATE_SOMEWHERE = %w{ ItemAssembliesCanBuild }
 
 module QBFC
   # Create QBElement classes
-  (QBFC_LIST_TYPES + QBFC_ENTITY_TYPES + QBFC_ITEM_TYPES + QBFC_TERMS_TYPES + QBFC_REPORT_TYPES + QBFC_INFO_TYPES + QBFC_DELETE_ONLY + %w{DataExt DataExtDef Entity}).uniq.each do | qb_element_name |
+  (QBFC_REPORT_TYPES + QBFC_INFO_TYPES + QBFC_DELETE_ONLY + %w{DataExt DataExtDef Entity}).uniq.each do | qb_element_name |
     const_set(qb_element_name, Class.new(Base))
-        
-    unless (QBFC_LIST_NO_MOD_TYPES + QBFC_DELETE_ONLY).include?(qb_element_name)
-      const_get(qb_element_name).class_eval do
-        const_set(:ALLOWS_UPDATE, true)
-      end
-    end
   end
 end
