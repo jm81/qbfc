@@ -19,7 +19,7 @@ module QBFC
     # - +names+: Array of class names.
     # - +superclass+: Superclass of classes to be generated.
     # - +includes+: hash of Module => names of classes to include this module.
-    def generate(names, superclass, include_modules)
+    def generate(names, superclass, include_modules = {})
       names.each do | class_name |
         const_set(class_name, Class.new(superclass))
       end

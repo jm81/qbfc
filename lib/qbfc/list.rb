@@ -53,7 +53,7 @@ module QBFC
 end
 
 # Require subclass files
-%w{ entity item }.each do |file|
+%w{ entity item terms }.each do |file|
   require File.dirname(__FILE__) + '/' + file
 end
 
