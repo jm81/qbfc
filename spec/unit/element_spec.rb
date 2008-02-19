@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-module QBFC::ElementTest
+module QBFC::Test
   class BaseKlass < QBFC::Element
     is_base_class
   end
@@ -19,7 +19,7 @@ describe QBFC::Element do
     @ole_wrapper = mock(QBFC::OLEWrapper)
     @ole_object = mock(WIN32OLE)
     @ole_methods = ["FullName", "DataExtRetList"]
-    @element = QBFC::ElementTest::NormalKlass.new(@sess, @ole_wrapper)
+    @element = QBFC::Test::NormalKlass.new(@sess, @ole_wrapper)
   end
 
   describe "#initialize" do
@@ -27,24 +27,24 @@ describe QBFC::Element do
       @request = mock(QBFC::Request)
       @request.should_receive(:ole_object).and_return(@ole_object)
       QBFC::Request.should_receive(:new).with(@sess, "NormalKlassAdd").and_return(@request)
-      QBFC::ElementTest::NormalKlass.new(@sess)
+      QBFC::Test::NormalKlass.new(@sess)
     end
     
     it "should assign the Add request as the @setter" do
       @request = mock(QBFC::Request)
       @request.stub!(:ole_object).and_return(@ole_object)
       QBFC::Request.should_receive(:new).with(@sess, "NormalKlassAdd").and_return(@request)
-      QBFC::ElementTest::NormalKlass.new(@sess).
+      QBFC::Test::NormalKlass.new(@sess).
           instance_variable_get(:@setter).should == @request
     end
     
     it "should error if class is_base_class?" do
       lambda {
-        QBFC::ElementTest::BaseKlass.new(@sess)
+        QBFC::Test::BaseKlass.new(@sess)
       }.should raise_error(QBFC::BaseClassNewError)
 
       lambda {
-        QBFC::ElementTest::BaseKlass.new(@sess, @ole_wrapper)
+        QBFC::Test::BaseKlass.new(@sess, @ole_wrapper)
       }.should raise_error(QBFC::BaseClassNewError)
     end
   end
@@ -57,7 +57,7 @@ describe QBFC::Element do
     end
     
     it "should return true if ole_object is an AddRq" do
-      QBFC::ElementTest::NormalKlass.new(@sess).new_record?.should be_true
+      QBFC::Test::NormalKlass.new(@sess).new_record?.should be_true
     end
 
     it "should return false if ole_object is from a QueryRq" do
@@ -67,8 +67,8 @@ describe QBFC::Element do
   
   describe ".is_base_class? (and is_base_class macro)" do
     it "should return true if Class is_base_class has been called" do
-      QBFC::ElementTest::BaseKlass.is_base_class?.should be_true
-      QBFC::ElementTest::NormalKlass.is_base_class?.should be_false
+      QBFC::Test::BaseKlass.is_base_class?.should be_true
+      QBFC::Test::NormalKlass.is_base_class?.should be_false
     end
   end
   
@@ -108,7 +108,7 @@ describe QBFC::Element do
       QBFC::Request.should_receive(:new).with(@sess, "NormalKlassAdd").and_return(@request)
       @request.should_receive(:submit)
 
-      QBFC::ElementTest::NormalKlass.new(@sess).save
+      QBFC::Test::NormalKlass.new(@sess).save
     end
     
     it "should raise an error if there is no setter object" do

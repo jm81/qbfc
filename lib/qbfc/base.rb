@@ -1,13 +1,13 @@
 class QBFC::Base
   class << self
   
-    def find(sess, *args)         
-      if args[0].kind_of?(String) # Single FullName or ListID
-        find_by_unique_id(sess, args[0], *args)
+    def find_base(sess, what, *args)         
+      if what.kind_of?(String) # Single FullName or ListID
+        find_by_unique_id(sess, what, *args)
       else
         
-        if args[1].kind_of?(QBFC::Request)
-          q = args[1]
+        if args[0].kind_of?(QBFC::Request)
+          q = args[0]
         else
           q = create_query(sess)
         end
@@ -53,8 +53,8 @@ class QBFC::Base
         list = q.response
         
         if list.nil?
-          (args[0] == :all || args.empty?) ? [] : nil
-        elsif args[0] == :all || args.empty?
+          (what == :all || args.empty?) ? [] : nil
+        elsif what == :all || args.empty?
           ary = []
           0.upto(list.Count - 1) do |i|
             ary << new(sess, list.GetAt(i))

@@ -29,19 +29,7 @@ describe QBFC::List do
     @response.stub!(:ole_methods).and_return(["GetAt"])
   end
 
-  describe ".find" do
-    it "should find_by_name_or_id if the first argument is neither :all nor :first"
-    it "should return only first entry if first argument is :first"
-    it "should set request#max_returned to 1 if :first"
-    it "should return an array if first argument is :all"
-    it "should return nil if no elements are found unless finding :all"
-    it "should return an empty array if no elements are found when finding :all"
-    it "can accept a Request object"
-    it "generates a Request object if not given one"
-    it "accepts conditions"
-    it "passes additional arguments to Request"
-    it "should get request#response"
-    
+  describe ".find" do    
     describe ".find(for base_class Lists)" do 
       it "should request only ListID"
       it "should send class ChildList::find_by_id with ListID and find options for each"

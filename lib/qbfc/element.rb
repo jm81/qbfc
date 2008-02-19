@@ -23,6 +23,10 @@ module QBFC
       def is_base_class?
         @is_base_class ? true : false
       end
+      
+      def find(*args)
+        find_base(*args)
+      end
     end
     
     is_base_class
