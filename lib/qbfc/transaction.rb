@@ -44,6 +44,21 @@ module QBFC
       req.submit
       return true
     end
+    
+    # Change cleared status of transaction
+    # status can be one of:
+    # - QBFC::CsCleared (or true)
+    # - QBFC::CsNotCleared (or false)
+    # - QBFC::CsPending
+    def cleared_status=(status)
+      req = QBFC::Request.new(@sess, "ClearedStatusMod")
+      req.txn_id = id
+      status = QBFC_CONST::CsCleared if status === true
+      status = QBFC_CONST::CsNotCleared if status === false
+      req.cleared_status = status
+      req.submit
+      return status
+    end
   end
 end
 
