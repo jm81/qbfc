@@ -3,7 +3,7 @@ class QBFC::Base
   
     def find(sess, *args)         
       if args[0].kind_of?(String) # Single FullName or ListID
-        find_by_unique_id(sess, args[0])
+        find_by_unique_id(sess, args[0], *args)
       else
         
         if args[1].kind_of?(QBFC::Request)
