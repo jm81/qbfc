@@ -92,30 +92,49 @@ describe QBFC::List do
       super
       @request.should_receive(:ORAccountListQuery).and_return(@list_query)
       @list_query.should_receive(:ListIDList).and_return(@list_id_list)
-      @list_id_list.should_receive(:Add).with("{123-456}")
+      @list_id_list.should_receive(:Add).with("123-456")
     end
     
     it "should set up Request, specifying ListIDList" do
       setup_request
-      QBFC::Test::ListFind.find_by_id(@sess, "{123-456}")
+      QBFC::Test::ListFind.find_by_id(@sess, "123-456")
     end
   
     it "should return a List object" do
       setup_request
-      list = QBFC::Test::ListFind.find_by_id(@sess, "{123-456}")
+      list = QBFC::Test::ListFind.find_by_id(@sess, "123-456")
       list.should be_kind_of(QBFC::Test::ListFind)
     end
   
     it "should return nil if none found" do
       setup_request
       @response.should_receive(:GetAt).with(0).and_return(nil)
-      QBFC::Test::ListFind.find_by_id(@sess, "{123-456}").should be_nil
+      QBFC::Test::ListFind.find_by_id(@sess, "123-456").should be_nil
     end
   end
   
-  describe ".find_by_name_or_id" do
-    it "should try to find_by_id"
-    it "should try to find_by_name if id fails"
-    it "should return nil if both name and id return nil"
+  describe ".find_by_name_or_id" do    
+    it "should try to find_by_id" do
+      QBFC::Test::ListFind.should_receive(:find_by_id).with(@sess, "123-456").and_return("List By ID")
+      QBFC::Test::ListFind.find_by_name_or_id(@sess, "123-456").should == "List By ID"
+    end
+    
+    it "should try to find_by_name if id fails" do
+      QBFC::Test::ListFind.should_receive(:find_by_id).with(@sess, "123-456").and_return(nil)
+      QBFC::Test::ListFind.should_receive(:find_by_name).with(@sess, "123-456").and_return("List By Name")
+      QBFC::Test::ListFind.find_by_name_or_id(@sess, "123-456").should == "List By Name"
+    end
+    
+    it "should return nil if both name and id return nil" do
+      QBFC::Test::ListFind.should_receive(:find_by_id).with(@sess, "123-456").and_return(nil)
+      QBFC::Test::ListFind.should_receive(:find_by_name).with(@sess, "123-456").and_return(nil)
+      QBFC::Test::ListFind.find_by_name_or_id(@sess, "123-456").should be_nil
+    end
+
+    it "should be aliased as .find_by_unique_id" do
+      QBFC::Test::ListFind.should_receive(:find_by_id).with(@sess, "123-456").and_return(nil)
+      QBFC::Test::ListFind.should_receive(:find_by_name).with(@sess, "123-456").and_return(nil)
+      QBFC::Test::ListFind.find_by_unique_id(@sess, "123-456").should be_nil
+    end
   end
 end

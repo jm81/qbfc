@@ -3,7 +3,7 @@ class QBFC::Base
   
     def find(sess, *args)         
       if args[0].kind_of?(String) # Single FullName or ListID
-        find_by_full_name_or_list_id(sess, args[0])
+        find_by_unique_id(sess, args[0])
       else
         
         if args[1].kind_of?(QBFC::Request)
@@ -69,12 +69,6 @@ class QBFC::Base
           end
         end
       end
-    end
-    
-    def find_by_full_name_or_list_id(sess, id, query_options = {})
-      id =~ /\d+-\d+/ ?
-        find_by_list_id(sess, id, query_options) :
-        find_by_full_name(sess, id, query_options)
     end
     
     def list_query

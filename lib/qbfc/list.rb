@@ -26,6 +26,13 @@ module QBFC
         find(sess, :first, q, options)
       end
       
+      # Find by either name or id. Tries id first, then name.
+      def find_by_name_or_id(*args)
+        find_by_id(*args) || find_by_name(*args)
+      end
+      
+      alias_method :find_by_unique_id, :find_by_name_or_id
+      
     end
     
     # Alias of ListID for this record. This is a unique within each type of List.
