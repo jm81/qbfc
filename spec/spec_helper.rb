@@ -30,8 +30,11 @@ module QBFC
       @dirname = TMP_DIRNAME + "\\fixture_#{@@i}"
       FileUtils.rm_rf(@dirname)
       FileUtils.mkdir_p(@dirname)
-
-      FileUtils.cp_r FIXTURE_DIRNAME + "\\.", @dirname
+      
+      ['lgb', 'qbw', 'qbw.ND', 'qbw.TLG'].each do |ext|
+        FileUtils.cp FIXTURE_DIRNAME + "\\test.#{ext}", @dirname
+      end
+      
       open_sess
     end
     
