@@ -48,14 +48,14 @@ describe QBFC::Transaction do
       @txn.display
     end
     
-    it "should call TxnDisplayAdd for existing records" do
+    it "should call TxnDisplayMod for existing records" do
       @ole_wrapper.should_receive(:txn_id).and_return('123-456')
 
       QBFC::Request.should_receive(:new).with(@sess, "TxnDisplayMod").and_return(@display_rq)
       @display_rq.should_receive(:txn_display_mod_type=).with(QBFC_CONST::TdmtCheck)
       @display_rq.should_receive(:txn_id=).with('123-456')
       @display_rq.should_receive(:submit)
-      QBFC::Test::Txn.new(@sess, @ole_wrapper).display
+      @txn.display
     end
   end
   

@@ -55,7 +55,26 @@ describe QBFC::List do
   end
   
   describe "#display" do
-    it "should call ListDisplayAdd for new records"
-    it "should call ListDisplayMod for existing records"
+    before(:each) do
+      @display_rq = mock(QBFC::Request)
+    end
+  
+    it "should call ListDisplayAdd for new records" do
+      QBFC::Request.should_receive(:new).with(@sess, "ListDisplayAdd").and_return(@display_rq)
+      @display_rq.should_receive(:list_display_add_type=).with(QBFC_CONST::LdatAccount)
+      @display_rq.should_receive(:submit)
+      @list.instance_variable_set(:@new_record, true)
+      @list.display
+    end
+    
+    it "should call ListDisplayMod for existing records" do
+      @ole_wrapper.should_receive(:list_id).and_return('123-456')
+
+      QBFC::Request.should_receive(:new).with(@sess, "ListDisplayMod").and_return(@display_rq)
+      @display_rq.should_receive(:list_display_mod_type=).with(QBFC_CONST::LdatAccount)
+      @display_rq.should_receive(:list_id=).with('123-456')
+      @display_rq.should_receive(:submit)
+      @list.display
+    end
   end
 end

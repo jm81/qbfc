@@ -55,7 +55,21 @@ module QBFC
       req.list_id = id
       req.submit
       return true
-    end    
+    end
+    
+    # Display the Transaction add (for new records) or edit dialog box
+    def display
+      if new_record?
+        req = QBFC::Request.new(@sess, "ListDisplayAdd")
+        req.list_display_add_type = QBFC_CONST::const_get("Ldat#{qb_name}")
+      else
+        req = QBFC::Request.new(@sess, "ListDisplayMod")
+        req.list_display_mod_type = QBFC_CONST::const_get("Ldmt#{qb_name}")
+        req.list_id = id
+      end
+      req.submit
+      return true
+    end
   end
 end
 
