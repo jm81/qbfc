@@ -59,6 +59,20 @@ module QBFC
       req.submit
       return status
     end
+    
+    # Display the Transaction add (for new records) or edit dialog box
+    def display
+      if new_record?
+        req = QBFC::Request.new(@sess, "TxnDisplayAdd")
+        req.txn_display_add_type = QBFC_CONST::const_get("Tdat#{qb_name}")
+      else
+        req = QBFC::Request.new(@sess, "TxnDisplayMod")
+        req.txn_display_mod_type = QBFC_CONST::const_get("Tdmt#{qb_name}")
+        req.txn_id = id
+      end
+      req.submit
+      return true
+    end
   end
 end
 

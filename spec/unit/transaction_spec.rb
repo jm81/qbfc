@@ -36,8 +36,27 @@ describe QBFC::Transaction do
   end
   
   describe "#display" do
-    it "should call TxnDisplayAdd for new records"
-    it "should call TxnDisplayMod for existing records"
+    before(:each) do
+      @display_rq = mock(QBFC::Request)
+    end
+  
+    it "should call TxnDisplayAdd for new records" do
+      QBFC::Request.should_receive(:new).with(@sess, "TxnDisplayAdd").and_return(@display_rq)
+      @display_rq.should_receive(:txn_display_add_type=).with(QBFC_CONST::TdatCheck)
+      @display_rq.should_receive(:submit)
+      @txn.instance_variable_set(:@new_record, true)
+      @txn.display
+    end
+    
+    it "should call TxnDisplayAdd for existing records" do
+      @ole_wrapper.should_receive(:txn_id).and_return('123-456')
+
+      QBFC::Request.should_receive(:new).with(@sess, "TxnDisplayMod").and_return(@display_rq)
+      @display_rq.should_receive(:txn_display_mod_type=).with(QBFC_CONST::TdmtCheck)
+      @display_rq.should_receive(:txn_id=).with('123-456')
+      @display_rq.should_receive(:submit)
+      QBFC::Test::Txn.new(@sess, @ole_wrapper).display
+    end
   end
   
   describe "#cleared_status=" do
