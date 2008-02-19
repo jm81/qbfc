@@ -1,9 +1,9 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe QBFC::Base do
 
   before(:each) do 
-    @integration = QBFC::Integration.new
+    @integration = QBFC::Integration::reader
     @sess = @integration.session
   end
   

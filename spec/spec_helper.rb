@@ -1,7 +1,7 @@
 require 'rubygems'
 gem 'rspec'
 require 'spec'
-require File.dirname(__FILE__) + '/../lib/qbfc'
+require File.expand_path(File.dirname(__FILE__) + '/../lib/qbfc')
 
 Spec::Runner.configure do |config|
 
@@ -12,10 +12,19 @@ module QBFC
     FIXTURE_DIRNAME = File.dirname(__FILE__) + "\\fixtures"
     FIXTURE_FILENAME = FIXTURE_DIRNAME + "\\test.qbw"
     TMP_DIRNAME = File.dirname(__FILE__) + "\\tmp"
+    
+    class << self
+      def reader
+        @@reader ||= new(true)
+        @@reader.open_sess
+        @@reader
+      end
+    end
 
-    def initialize
+    def initialize(is_reader = false)
       FileUtils.mkdir_p(TMP_DIRNAME)
 
+      @is_reader = is_reader
       @@i ||= 0
       @@i += 1
       @dirname = TMP_DIRNAME + "\\fixture_#{@@i}"
@@ -23,7 +32,14 @@ module QBFC
       FileUtils.mkdir_p(@dirname)
 
       FileUtils.cp_r FIXTURE_DIRNAME + "\\.", @dirname
-      filename = File.expand_path(@dirname + "\\test.qbw").gsub(/\//, "\\")
+      open_sess
+    end
+    
+    def filename
+      File.expand_path(@dirname + "\\test.qbw").gsub(/\//, "\\")
+    end
+    
+    def open_sess
       @sess = QBFC::Session.new(:filename => filename)
     end
     
@@ -33,8 +49,10 @@ module QBFC
     
     def close
       @sess.close
-      sleep(5)
-      FileUtils.rm_rf(@dirname)
+      unless @is_reader
+        sleep(5)
+        FileUtils.rm_rf(@dirname) 
+      end
     end
   end
 
