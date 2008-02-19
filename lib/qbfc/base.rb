@@ -1,11 +1,5 @@
 class QBFC::Base
   class << self
-
-    # Does this class support update operations,
-    # i.e. does QBFC support an Modify request for this type?
-    def allows_update?
-      self.const_defined?(:ALLOWS_UPDATE) ? self::ALLOWS_UPDATE : false
-    end
   
     def find(sess, *args)         
       if args[0].kind_of?(String) # Single FullName or ListID
@@ -128,23 +122,7 @@ class QBFC::Base
   #   a response to a QueryRq. It is unlikely that this will be used directly.
   def initialize(sess, ole = nil)
     @sess, @ole = sess, ole    
-    @ole = QBFC::OLEWrapper.new(@ole) if @ole.kind_of?(WIN32OLE)
-    
-    if self.class.allows_update? && ole
-      mod = QBFC::Request.new(sess, "#{self.class.qb_name}Mod")
-          
-      if respond_to_ole?(:ListID)
-        mod.list_id = @ole.list_id
-      elsif respond_to_ole?(:TxnID)
-        mod.txn_id = @ole.txn_id
-      end
-
-      mod.edit_sequence = @ole.edit_sequence
-      
-      @setter = mod
-      @ole.setter = mod.ole_object
-    end
-    
+    @ole = QBFC::OLEWrapper.new(@ole) if @ole.kind_of?(WIN32OLE)    
   end
   
   # List the methods of the OLE object
