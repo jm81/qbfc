@@ -31,7 +31,7 @@ QBFC_ANOTHER_TO_INTEGRATE_SOMEWHERE = %w{ ItemAssembliesCanBuild }
 
 module QBFC
   # Create QBElement classes
-  (QBFC_REPORT_TYPES + QBFC_INFO_TYPES + QBFC_DELETE_ONLY + %w{DataExt DataExtDef Entity}).uniq.each do | qb_element_name |
+  (QBFC_REPORT_TYPES + QBFC_INFO_TYPES + QBFC_DELETE_ONLY + %w{DataExt DataExtDef}).uniq.each do | qb_element_name |
     const_set(qb_element_name, Class.new(Base))
   end
 end

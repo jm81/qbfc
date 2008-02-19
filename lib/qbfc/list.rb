@@ -53,6 +53,10 @@ module QBFC
 end
 
 # Require subclass files
+%w{ entity }.each do |file|
+  require File.dirname(__FILE__) + '/' + file
+end
+
 Dir[File.dirname(__FILE__) + '/lists/*.rb'].each do |file|
   require file
 end
