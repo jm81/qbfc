@@ -39,7 +39,7 @@ describe QBFC::Element do
   end
 
   describe ".find" do
-    it "should find_by_unique_id if the 'what' argument is neither :all nor :first" do
+    it "should find_by_unique_id if the 'what' argument is neither :all nor :first"
     it "should return only first entry if 'what' argument is :first"
     it "should set request#max_returned to 1 if :first"
     it "should return an array if 'what' argument is :all"
