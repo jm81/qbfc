@@ -1,10 +1,7 @@
 class QBFC::Base
   class << self
   
-    def find_base(sess, what, *args)         
-      if what.kind_of?(String) # Single FullName or ListID
-        find_by_unique_id(sess, what, *args)
-      else
+    def find_base(sess, what, *args)
         
         if args[0].kind_of?(QBFC::Request)
           q = args[0]
@@ -50,29 +47,12 @@ class QBFC::Base
           end
         end
         
-        list = q.response
-        
-        if list.nil?
-          (what == :all || args.empty?) ? [] : nil
-        elsif what == :all || args.empty?
-          ary = []
-          0.upto(list.Count - 1) do |i|
-            ary << new(sess, list.GetAt(i))
-          end
-          ary
-        else
-          if list.ole_methods.detect{|m| m.to_s == "GetAt"}
-            item = list.GetAt(0)
-            return( item ? new(sess, item) : nil )
-          else
-            return new(sess, list)
-          end
-        end
-      end
+        return q
+
     end
     
     def list_query
-      if self.qb_name == "Employee" || self.qb_name == "OtherName"
+      if qb_name == "Employee" || qb_name == "OtherName"
         "ORListQuery"
       else
         "OR#{self.qb_name}ListQuery"
@@ -80,7 +60,7 @@ class QBFC::Base
     end
     
     def create_query(sess)
-      QBFC::Request.new(sess, "#{self.qb_name}Query")
+      QBFC::Request.new(sess, "#{qb_name}Query")
     end
     
     def create_entity(sess, r, query_options = {})

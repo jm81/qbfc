@@ -24,8 +24,23 @@ module QBFC
         @is_base_class ? true : false
       end
       
-      def find(*args)
-        find_base(*args)
+      def find(sess, what, *args)
+        if what.kind_of?(String) # Single FullName or ListID
+          return find_by_unique_id(sess, what, *args)
+        end
+
+        q = find_base(sess, what, *args)
+        list = q.response
+        
+        if list.nil?
+          (what == :all) ? [] : nil
+        elsif what == :all
+          (0..(list.Count - 1)).collect { |i|
+            new(sess, list.GetAt(i))
+          }
+        else
+          new(sess, list.GetAt(0))
+        end
       end
     end
     

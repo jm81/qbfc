@@ -24,7 +24,7 @@ describe QBFC::Transaction do
   def setup_request
     QBFC::Request.should_receive(:new).with(@sess, 'CheckQuery').and_return(@request)
     @request.should_receive(:kind_of?).with(QBFC::Request).and_return(true)
-    @request.should_receive(:response).and_return(@response)
+    @request.stub!(:response).and_return(@response)
     @response.stub!(:GetAt).with(0).and_return(@ole_wrapper)
     @response.stub!(:ole_methods).and_return(["GetAt"])
   end
@@ -61,7 +61,7 @@ describe QBFC::Transaction do
   
     it "should return nil if none found" do
       setup_request
-      @response.should_receive(:GetAt).with(0).and_return(nil)
+      @request.should_receive(:response).and_return(nil)
       QBFC::Test::TxnFind.find_by_ref(@sess, "12345").should be_nil
     end
   end
@@ -91,7 +91,7 @@ describe QBFC::Transaction do
   
     it "should return nil if none found" do
       setup_request
-      @response.should_receive(:GetAt).with(0).and_return(nil)
+      @request.should_receive(:response).and_return(nil)
       QBFC::Test::TxnFind.find_by_id(@sess, "123-456").should be_nil
     end
   end
