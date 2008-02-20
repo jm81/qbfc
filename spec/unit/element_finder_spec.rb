@@ -81,4 +81,26 @@ describe QBFC::Element do
       QBFC::Test::ElementFind::find(@sess, :first)
     end
   end
+  
+  describe ".query_for" do
+    it "gets the OR*Query for the given Request" do
+      @or_query = mock("OLEWrapper#or_query")
+      @request.should_receive(:ole_methods).and_return(["TxnID", "RefNumber", "ORTransactionQuery", "OwnerIDList"])
+      @request.should_receive(:ORTransactionQuery).and_return(@or_query)
+      QBFC::Test::ListFind.__send__(:query_for, @request).should be(@or_query)
+    end
+  end
+  
+  describe ".filter_for" do
+    it "gets the *Filter for the given Request" do
+      @or_query = mock("OLEWrapper#or_query")
+      @filter = mock("OLEWrapper#filter")
+      
+      @request.should_receive(:ole_methods).and_return(["TxnID", "RefNumber", "ORTransactionQuery", "OwnerIDList"])
+      @request.should_receive(:ORTransactionQuery).and_return(@or_query)
+      @or_query.should_receive(:ole_methods).and_return(["TxnIDList", "RefNumberList", "TransactionFilter"])
+      @or_query.should_receive(:TransactionFilter).and_return(@filter)
+      QBFC::Test::ListFind.__send__(:filter_for, @request).should be(@filter)
+    end
+  end
 end
