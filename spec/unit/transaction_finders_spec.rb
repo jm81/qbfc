@@ -19,6 +19,11 @@ describe QBFC::Transaction do
     @request = mock("QBFC::Request")
     @txn_query = mock("QBFC::OLEWrapper#txn_query")
     @response = mock("QBFC::Request#response")
+    
+    # Filter mock
+    @filter = mock("QBFC::OLEWrapper#Filter")
+    @request.stub!(:filter).and_return(@filter)
+    @filter.stub!(:max_returned=)
   end
   
   def setup_request

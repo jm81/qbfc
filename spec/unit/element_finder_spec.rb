@@ -29,6 +29,11 @@ describe QBFC::Element do
     # Request related mocks
     @request = mock("QBFC::Request")
     @response = mock("QBFC::Request#response")
+    
+    # Filter mock
+    @filter = mock("QBFC::OLEWrapper#Filter")
+    @request.stub!(:filter).and_return(@filter)
+    @filter.stub!(:max_returned=)
   end
   
   def setup_request
@@ -37,6 +42,7 @@ describe QBFC::Element do
     @response.stub!(:GetAt).and_return(@ole_wrapper)
     @response.stub!(:ole_methods).and_return(["GetAt"])
     @response.stub!(:Count).and_return(2)
+
     QBFC::Test::ElementFind.should_receive(:new).with(@sess, @ole_wrapper).at_least(:once).and_return(@element)
   end
 
@@ -51,10 +57,16 @@ describe QBFC::Element do
       QBFC::Test::ElementFind::find(@sess, :first).should be(@element)
     end
     
-    it "should set request#max_returned to 1 if :first"
+    it "should set request#max_returned to 1 if :first" do
+      setup_request
+      @request.should_receive(:filter).and_return(@filter)
+      @filter.should_receive(:max_returned=).with(1)
+      QBFC::Test::ElementFind::find(@sess, :first)
+    end
 
     it "should return an array if 'what' argument is :all" do
       setup_request
+      @filter.should_not_receive(:max_returned=)
       QBFC::Test::ElementFind::find(@sess, :all).should == [@element, @element]
     end
     
@@ -79,28 +91,6 @@ describe QBFC::Element do
       setup_request
       @request.should_receive(:response).and_return(@response)    
       QBFC::Test::ElementFind::find(@sess, :first)
-    end
-  end
-  
-  describe ".query_for" do
-    it "gets the OR*Query for the given Request" do
-      @or_query = mock("OLEWrapper#or_query")
-      @request.should_receive(:ole_methods).and_return(["TxnID", "RefNumber", "ORTransactionQuery", "OwnerIDList"])
-      @request.should_receive(:ORTransactionQuery).and_return(@or_query)
-      QBFC::Test::ListFind.__send__(:query_for, @request).should be(@or_query)
-    end
-  end
-  
-  describe ".filter_for" do
-    it "gets the *Filter for the given Request" do
-      @or_query = mock("OLEWrapper#or_query")
-      @filter = mock("OLEWrapper#filter")
-      
-      @request.should_receive(:ole_methods).and_return(["TxnID", "RefNumber", "ORTransactionQuery", "OwnerIDList"])
-      @request.should_receive(:ORTransactionQuery).and_return(@or_query)
-      @or_query.should_receive(:ole_methods).and_return(["TxnIDList", "RefNumberList", "TransactionFilter"])
-      @or_query.should_receive(:TransactionFilter).and_return(@filter)
-      QBFC::Test::ListFind.__send__(:filter_for, @request).should be(@filter)
     end
   end
 end

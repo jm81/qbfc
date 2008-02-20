@@ -50,6 +50,24 @@ module QBFC
       submit.ResponseList.GetAt(0).Detail
     end
     
+    # Get the OR*Query object of the given Request
+    # For example, the ORListQuery
+    def query
+      query_name = @request.ole_methods.detect{|m| m.to_s =~ /Query\Z/}
+      return nil if query_name.nil?
+      @request.send(query_name.to_sym)
+    end
+    
+    # Get the *Filter object of the given Request
+    # For example, the ListFilter
+    def filter
+      q = self.query
+      return nil if q.nil?
+      filter_name = q.ole_methods.detect{|m| m.to_s =~ /Filter\Z/}
+      return nil if filter_name.nil?
+      q.send(filter_name.to_sym)
+    end
+    
     # Send missing methods to @ole_object (OLEWrapper)
     def method_missing(symbol, *params) #:nodoc:
       @request.qbfc_method_missing(@sess, symbol, *params)

@@ -116,5 +116,53 @@ describe QBFC::Request do
       request.response_xml
     end
   end
+  
+  describe "#query" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+      @request.instance_variable_set(:@request, @ole_request)
+      
+      @or_query = mock("OLEWrapper#or_query")    
+    end
+  
+    it "gets the OR*Query for the given Request" do
+      @ole_request.should_receive(:ole_methods).and_return(["TxnID", "RefNumber", "ORTransactionQuery", "OwnerIDList"])
+      @ole_request.should_receive(:ORTransactionQuery).and_return(@or_query)
+      @request.query.should be(@or_query)
+    end
+    
+    it "should return nil if no query name is detected" do
+      @ole_request.should_receive(:ole_methods).and_return(["TxnID", "RefNumber", "OwnerIDList"])
+      @request.query.should be_nil
+    end
+  end
+  
+  describe "#filter" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+      @request.instance_variable_set(:@request, @ole_request)
+      
+      @or_query = mock("OLEWrapper#or_query")
+      @filter = mock("OLEWrapper#filter")
+      @ole_request.stub!(:ole_methods).and_return(["TxnID", "RefNumber", "ORTransactionQuery", "OwnerIDList"])
+      @ole_request.stub!(:ORTransactionQuery).and_return(@or_query)
+    end
+
+    it "gets the *Filter for the given Request" do
+      @or_query.should_receive(:ole_methods).and_return(["TxnIDList", "RefNumberList", "TransactionFilter"])
+      @or_query.should_receive(:TransactionFilter).and_return(@filter)
+      @request.filter.should be(@filter)
+    end
+    
+    it "should return nil if no filter name is detected" do
+      @or_query.should_receive(:ole_methods).and_return(["TxnIDList", "RefNumberList"])
+      @request.filter.should be_nil
+    end
+    
+    it "should return nil if the #query is nil" do
+      @ole_request.should_receive(:ole_methods).and_return([])
+      @request.filter.should be_nil
+    end
+  end
 
 end

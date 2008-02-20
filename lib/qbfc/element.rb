@@ -30,6 +30,8 @@ module QBFC
         end
 
         q = find_base(sess, what, *args)
+        
+        q.filter.max_returned = 1 if what == :first
         list = q.response
         
         if list.nil?
@@ -42,23 +44,6 @@ module QBFC
           new(sess, list.GetAt(0))
         end
       end
-      
-      # Get the OR*Query object of the given Request
-      # For example, the ORListQuery
-      def query_for(rq) #:nodoc:
-        query_name = rq.ole_methods.detect{|m| m.to_s =~ /Query\Z/}
-        rq.send(query_name.to_sym)
-      end
-
-      # Get the *Filter object of the given Request
-      # For example, the ListFilter
-      def filter_for(rq) #:nodoc:
-        q = query_for(rq)
-        filter_name = q.ole_methods.detect{|m| m.to_s =~ /Filter\Z/}
-        q.send(filter_name.to_sym)
-      end
-      
-      protected :query_for, :filter_for
 
     end
     

@@ -19,6 +19,11 @@ describe QBFC::List do
     @request = mock("QBFC::Request")
     @list_query = mock("QBFC::OLEWrapper#list_query")
     @response = mock("QBFC::Request#response")
+    
+    # Filter mock
+    @filter = mock("QBFC::OLEWrapper#Filter")
+    @request.stub!(:filter).and_return(@filter)
+    @filter.stub!(:max_returned=)
   end
   
   def setup_request
