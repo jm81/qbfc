@@ -24,6 +24,7 @@ describe QBFC::List do
     @filter = mock("QBFC::OLEWrapper#Filter")
     @request.stub!(:filter).and_return(@filter)
     @filter.stub!(:max_returned=)
+    @request.stub!(:filter_available?).and_return(true)
   end
   
   def setup_request

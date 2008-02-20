@@ -55,7 +55,7 @@ module QBFC
     def query
       query_name = @request.ole_methods.detect{|m| m.to_s =~ /Query\Z/}
       return nil if query_name.nil?
-      @request.send(query_name.to_sym)
+      @request.send(query_name.to_s.to_sym)
     end
     
     # Get the *Filter object of the given Request
@@ -65,7 +65,15 @@ module QBFC
       return nil if q.nil?
       filter_name = q.ole_methods.detect{|m| m.to_s =~ /Filter\Z/}
       return nil if filter_name.nil?
-      q.send(filter_name.to_sym)
+      q.send(filter_name.to_s.to_sym)
+    end
+    
+    # Returns where the filter is available for use. That is, that
+    # none of the query options other than filter have been used
+    def filter_available?
+      # -1 = unused, 2 = Filter used
+      self.query.ole_object.ortype == -1 ||
+        self.query.ole_object.ortype == 2
     end
     
     # Send missing methods to @ole_object (OLEWrapper)

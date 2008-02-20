@@ -165,4 +165,35 @@ describe QBFC::Request do
     end
   end
 
+  describe "#filter_available?" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+      @request.instance_variable_set(:@request, @ole_request)
+      
+      @or_query = mock("OLEWrapper#or_query")
+      @filter = mock("OLEWrapper#filter")
+      @ole_request.stub!(:ole_methods).and_return(["TxnID", "RefNumber", "ORTransactionQuery", "OwnerIDList", "ortype"])
+      @ole_request.stub!(:ORTransactionQuery).and_return(@or_query)
+      
+      @ole_object = mock(WIN32OLE)
+      @or_query.stub!(:ole_object).and_return(@ole_object)
+      @ole_object.stub!(:ole_object).and_return(["TxnID", "RefNumber", "ORTransactionQuery", "OwnerIDList", "ortype"])
+    end
+
+    it "should be true if no query options have been set" do
+      @ole_object.should_receive(:ortype).at_least(:once).and_return(-1)
+      @request.filter_available?.should be_true
+    end
+    
+    it "should be true if Filter option has been set" do
+      @ole_object.should_receive(:ortype).at_least(:once).and_return(2)
+      @request.filter_available?.should be_true
+    end
+    
+    it "should be false if a *List option has been set" do
+      @ole_object.should_receive(:ortype).at_least(:once).and_return(1)
+      @request.filter_available?.should be_false
+    end
+    
+  end
 end

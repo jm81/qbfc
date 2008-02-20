@@ -31,7 +31,9 @@ module QBFC
 
         q = find_base(sess, what, *args)
         
-        q.filter.max_returned = 1 if what == :first
+        if what == :first && q.filter_available?
+          q.filter.max_returned = 1
+        end
         list = q.response
         
         if list.nil?
