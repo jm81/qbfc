@@ -49,7 +49,7 @@ describe QBFC::List do
     
     def setup_request
       super
-      @request.should_receive(:ORAccountListQuery).and_return(@list_query)
+      @request.should_receive(:query).and_return(@list_query)
       @list_query.should_receive(:FullNameList).and_return(@full_name_list)
       @full_name_list.should_receive(:Add).with("Bob Customer")
     end
@@ -84,7 +84,7 @@ describe QBFC::List do
     
     def setup_request
       super
-      @request.should_receive(:ORAccountListQuery).and_return(@list_query)
+      @request.should_receive(:query).and_return(@list_query)
       @list_query.should_receive(:ListIDList).and_return(@list_id_list)
       @list_id_list.should_receive(:Add).with("123-456")
     end

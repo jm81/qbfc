@@ -12,7 +12,7 @@ module QBFC
       # +options+ are the same as those for in +find+.
       def find_by_name(sess, full_name, options = {})
         q = create_query(sess)
-        q.send(self.list_query).FullNameList.Add(full_name)
+        q.query.FullNameList.Add(full_name)
         find(sess, :first, q, options)
       end
       
@@ -22,7 +22,7 @@ module QBFC
       # +options+ are the same as those for in +find+.      
       def find_by_id(sess, id, options = {})
         q = create_query(sess)
-        q.send(self.list_query).ListIDList.Add(id)
+        q.query.ListIDList.Add(id)
         find(sess, :first, q, options)
       end
       

@@ -10,7 +10,7 @@ module QBFC
       # +options+ are the same as those for in +find+.
       def find_by_ref(sess, ref, options = {})
         q = create_query(sess)
-        q.send('ORTxnQuery').RefNumberList.Add(ref)
+        q.query.RefNumberList.Add(ref)
         find(sess, :first, q, options)
       end
       
@@ -18,7 +18,7 @@ module QBFC
       # +options+ are the same as those for in +find+.      
       def find_by_id(sess, id, options = {})
         q = create_query(sess)
-        q.send('ORTxnQuery').TxnIDList.Add(id)
+        q.query.TxnIDList.Add(id)
         find(sess, :first, q, options)
       end
       

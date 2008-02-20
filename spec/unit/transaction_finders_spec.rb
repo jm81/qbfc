@@ -49,7 +49,7 @@ describe QBFC::Transaction do
     
     def setup_request
       super
-      @request.should_receive(:ORTxnQuery).and_return(@txn_query)
+      @request.should_receive(:query).and_return(@txn_query)
       @txn_query.should_receive(:RefNumberList).and_return(@ref_list)
       @ref_list.should_receive(:Add).with("12345")
     end
@@ -79,7 +79,7 @@ describe QBFC::Transaction do
     
     def setup_request
       super
-      @request.should_receive(:ORTxnQuery).and_return(@txn_query)
+      @request.should_receive(:query).and_return(@txn_query)
       @txn_query.should_receive(:TxnIDList).and_return(@txn_id_list)
       @txn_id_list.should_receive(:Add).with("123-456")
     end

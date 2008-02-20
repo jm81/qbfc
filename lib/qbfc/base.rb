@@ -51,14 +51,6 @@ class QBFC::Base
 
     end
     
-    def list_query
-      if qb_name == "Employee" || qb_name == "OtherName"
-        "ORListQuery"
-      else
-        "OR#{self.qb_name}ListQuery"
-      end
-    end
-    
     def create_query(sess)
       QBFC::Request.new(sess, "#{qb_name}Query")
     end
