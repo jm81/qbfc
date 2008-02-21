@@ -15,6 +15,12 @@ module QBFC
       # session.company are equivalent.
       def get(sess, *args)
         q = create_query(sess)
+
+        options = args[-1]
+        if options.kind_of?(Hash)
+          q.add_owner_ids(options.delete(:owner_id))
+        end
+        
         new(sess, q.response)
       end
       

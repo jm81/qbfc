@@ -18,6 +18,8 @@ describe QBFC::Info do
     # Request related mocks
     @request = mock("QBFC::Request")
     @response = mock("QBFC::Request#response")
+    
+    @request.stub!(:add_owner_ids)
   end
   
   describe ".get" do
@@ -29,6 +31,15 @@ describe QBFC::Info do
     end
     
     it "should have an includes option"
+    
+    it "accepts an :owner_id option" do
+      QBFC::Request.stub!(:new).with(@sess, 'CompanyQuery').and_return(@request)
+      @request.stub!(:response).and_return(@response)
+      QBFC::Test::Info.stub!(:new).with(@sess, @response).and_return(@info)
+      
+      @request.should_receive(:add_owner_ids).with(1)
+      QBFC::Test::Info::get(@sess, :owner_id => 1)
+    end
     
     it "should accept a Request argument"
   end
