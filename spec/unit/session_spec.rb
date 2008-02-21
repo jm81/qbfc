@@ -97,10 +97,10 @@ describe QBFC::Session do
   
   it "should create an instance of QBFC::Base descendant from a singular method with params" do
     @base = mock(QBFC::Base)
-    QBFC::Customer.should_receive(:find_by_full_name_or_list_id).with(@qb_sess, '1234-5678').and_return(@base)
+    QBFC::Customer.should_receive(:find_by_unique_id).with(@qb_sess, '1234-5678').and_return(@base)
     @qb_sess.customer('1234-5678').should == @base
     
-    QBFC::Vendor.should_receive(:find_by_full_name_or_list_id).with(@qb_sess, '1234-5678').and_return(@base)
+    QBFC::Vendor.should_receive(:find_by_unique_id).with(@qb_sess, '1234-5678').and_return(@base)
     @qb_sess.vendor('1234-5678').should == @base
   end
 

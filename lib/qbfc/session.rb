@@ -120,7 +120,7 @@ module QBFC
         single_camelized_method = symbol.to_s.singularize.camelize.to_sym
         if QBFC.const_defined?(camelized_method)
           if params[0]
-            return QBFC::const_get(camelized_method).find_by_full_name_or_list_id(self, params[0])
+            return QBFC::const_get(camelized_method).find_by_unique_id(self, params[0])
           else
             return QBFC::const_get(camelized_method).find(self, :first)
           end
