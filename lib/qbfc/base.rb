@@ -37,11 +37,8 @@ class QBFC::Base
             options.delete(:conditions)
           end
           
-          if options[:owner_id]
-            q.OwnerIDList.Add(query_options[:owner_id])
-            options.delete(:owner_id)
-          end
-          
+          q.add_owner_ids(options.delete(:owner_id))
+
           options.each do |key, value|
             q.send(key.to_s.camelize).SetValue(value)
           end

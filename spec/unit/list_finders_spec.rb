@@ -25,6 +25,7 @@ describe QBFC::List do
     @request.stub!(:filter).and_return(@filter)
     @filter.stub!(:max_returned=)
     @request.stub!(:filter_available?).and_return(true)
+    @request.stub!(:add_owner_ids)
   end
   
   def setup_request
