@@ -69,7 +69,7 @@ describe QBFC::Request do
     QBFC::Request.new(@sess, 'CustomerQuery').to_xml
   end
   
-  describe "QBFC::Request#response" do
+  describe "#response" do
     before(:each) do
       @sess = mock(QBFC::Session)
       @request_set = mock(QBFC::OLEWrapper)
@@ -195,5 +195,27 @@ describe QBFC::Request do
       @request.filter_available?.should be_false
     end
     
+  end
+  
+  describe "#add_owner_ids" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+      @request.instance_variable_set(:@request, @ole_request)
+      @owner_list = mock(QBFC::OLEWrapper)
+    end
+  
+    it "can add a single owner id to the Request" do
+      @ole_request.should_receive(:OwnerIDList).and_return(@owner_list)
+      @owner_list.should_receive(:Add).with(0)
+      @request.add_owner_ids(0)
+    end
+
+    it "can add multiple owner ids to the Request" do
+      ids = ["{6B063959-81B0-4622-85D6-F548C8CCB517}", 0]
+      @ole_request.should_receive(:OwnerIDList).twice.and_return(@owner_list)
+      @owner_list.should_receive(:Add).with(ids[0])
+      @owner_list.should_receive(:Add).with(ids[1])
+      @request.add_owner_ids(ids)
+    end
   end
 end

@@ -76,6 +76,16 @@ module QBFC
         self.query.ole_object.ortype == 2
     end
     
+    # Add one or more OwnerIDs to the Request. Used in retrieving
+    # custom fields (aka private data extensions).
+    # Argument should be a single ID or an Array of IDs.
+    def add_owner_ids(ids)
+      ids = [ids] unless ids.respond_to?(:each)
+      ids.each do | id |
+        @request.OwnerIDList.Add(id)
+      end
+    end
+    
     # Send missing methods to @ole_object (OLEWrapper)
     def method_missing(symbol, *params) #:nodoc:
       @request.qbfc_method_missing(@sess, symbol, *params)
