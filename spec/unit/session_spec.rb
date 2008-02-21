@@ -119,6 +119,12 @@ describe QBFC::Session do
     @qb_sess.vendors.should == @collection
   end
   
+  it "should create QBFC::QBCollection QBFC::QBClass from #classes" do
+    @collection = mock(QBFC::QBCollection)
+    QBFC::QBCollection.should_receive(:new).with(@qb_sess, :QBClass).and_return(@collection)
+    @qb_sess.classes.should == @collection
+  end
+  
   it "should let OLEWrapper handle other unknown methods" do
     @ole_wrapper.should_receive(:qbfc_method_missing).with(@qb_sess, :FullName).and_return(true)
     @qb_sess.FullName

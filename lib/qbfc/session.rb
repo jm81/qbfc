@@ -104,6 +104,12 @@ module QBFC
       @ole_object = nil
     end
     
+    # The classes method allows using <tt>session.classes.find</tt> instead of
+    # <tt>session.q_b_classes.find</tt>, for finds on QBClass.
+    def classes
+      QBFC::QBCollection.new(self, :QBClass)
+    end
+    
     # Responsible for the conversion of ole_method name to more convential Ruby method names.
     # This specifies the methods for setting up an Entity, such as a Customer, directly, which is
     # not included in OLEWrapper (setting up entities that are children of another entity is).
