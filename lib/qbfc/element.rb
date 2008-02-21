@@ -24,6 +24,24 @@ module QBFC
         @is_base_class ? true : false
       end
       
+      # Find a QuickBooks record for the given session. 
+      # 
+      # session.[qb_name] aliases this functionality. The following
+      # pairs are equivalent:
+      # 
+      #   QBFC::Vendor.find(session, :first) <-> session.vendor
+      #   QBFC::Vendor.find(session, "Supply Shop") <-> session.vendor("Supply Shop")
+      #   QBFC::Vendor.find(session, :all) <-> session.vendors.find(:all)
+      # 
+      # Find requires a +session+ (representing a QBFC::Session) and
+      # a +what+ argument. +what+ can be one of:
+      # - <tt>:first</tt> - finds the first record fitting any given conditions.
+      # - <tt>:finds</tt> - finds all records fitting any given conditions.
+      # - An unique identifier, such as a ListID, FullName, RefNumber or TxnID
+      # 
+      # .find also accepts the follow options as a hash:
+      # - <tt>:owner_id</tt>: One or more OwnerIDs, used in accessing
+      #   custom fields (aka private data extensions).
       def find(sess, what, *args)
         if what.kind_of?(String) # Single FullName or ListID
           return find_by_unique_id(sess, what, *args)

@@ -13,6 +13,10 @@ module QBFC
       # session.[qb_name] aliases this functionality.
       # For example QBFC::Company.get(session) and
       # session.company are equivalent.
+      # 
+      # It accepts the follow options as a hash:
+      # - <tt>:owner_id</tt>: One or more OwnerIDs, used in accessing
+      #   custom fields (aka private data extensions).
       def get(sess, *args)
         q = create_query(sess)
 
