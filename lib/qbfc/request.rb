@@ -80,6 +80,8 @@ module QBFC
     # custom fields (aka private data extensions).
     # Argument should be a single ID or an Array of IDs.
     def add_owner_ids(ids)
+      return if ids.nil?
+      
       ids = [ids] unless ids.respond_to?(:each)
       ids.each do | id |
         @request.OwnerIDList.Add(id)

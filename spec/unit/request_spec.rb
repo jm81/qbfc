@@ -217,5 +217,11 @@ describe QBFC::Request do
       @owner_list.should_receive(:Add).with(ids[1])
       @request.add_owner_ids(ids)
     end
+
+    it "can accept nil and will do nothing" do
+      @ole_request.should_not_receive(:OwnerIDList)
+      @owner_list.should_not_receive(:Add)
+      @request.add_owner_ids(nil)
+    end
   end
 end
