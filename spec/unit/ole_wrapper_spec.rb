@@ -260,7 +260,7 @@ describe QBFC::OLEWrapper do
       
       entity = mock(QBFC::Entity)
       
-      QBFC::Entity.should_receive(:find_by_list_id).with(@sess, list_id).and_return(entity)
+      QBFC::Entity.should_receive(:find_by_id).with(@sess, list_id).and_return(entity)
       
       @wrapper.qbfc_method_missing(@sess, :payee).should == entity
     end
@@ -281,7 +281,7 @@ describe QBFC::OLEWrapper do
       
       account = mock(QBFC::Account)
       
-      QBFC::Account.should_receive(:find_by_list_id).with(@sess, list_id).and_return(account)
+      QBFC::Account.should_receive(:find_by_id).with(@sess, list_id).and_return(account)
       
       @wrapper.qbfc_method_missing(@sess, :account).should == account    
     end

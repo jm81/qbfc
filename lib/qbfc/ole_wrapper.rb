@@ -168,8 +168,8 @@ module QBFC
       ref_ole_object = @ole_object.send(ref_ole_name)
       if ref_ole_object
         ref_ole_name =~ /EntityRef/ ?
-          QBFC::Entity.find_by_list_id(@sess, ref_ole_object.ListID.GetValue(), *options) :
-          QBFC::const_get(ref_ole_name.gsub(/Ref/,"")).find_by_list_id(@sess, ref_ole_object.ListID.GetValue(), *options)
+          QBFC::Entity.find_by_id(@sess, ref_ole_object.ListID.GetValue(), *options) :
+          QBFC::const_get(ref_ole_name.gsub(/Ref/,"")).find_by_id(@sess, ref_ole_object.ListID.GetValue(), *options)
       else
         return nil
       end
