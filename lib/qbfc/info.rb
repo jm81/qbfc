@@ -18,12 +18,11 @@ module QBFC
       # - <tt>:owner_id</tt>: One or more OwnerIDs, used in accessing
       #   custom fields (aka private data extensions).
       def get(sess, *args)
-        q = create_query(sess)
-
-        options = args[-1]
-        if options.kind_of?(Hash)
-          q.add_owner_ids(options.delete(:owner_id))
-        end
+        # Setup q, options and base_options arguments
+        q, options, base_options = parse_find_args(*args)
+        q ||= create_query(sess)
+        
+        q.add_owner_ids(options.delete(:owner_id))
         
         new(sess, q.response)
       end
