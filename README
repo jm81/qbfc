@@ -1,11 +1,11 @@
-Ruby QBFC
-=========
+==QBFC-Ruby
 
-Introduction goes here.
+QBFC-Ruby provides a wrapper around QuickBooks' QBFC COM object, while
+allowing more or less direct access to the actual COM object.
 
+Obviously, test before using on your production data...
 
-Examples
-========
+==Examples
 
   # A very simple example, finding a single Customer by name
   QBFC::session do | qb |
