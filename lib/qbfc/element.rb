@@ -118,28 +118,7 @@ module QBFC
         end
       end
       
-      # <tt>find</tt> receives some optional arguments which can include
-      # a Request object and/or an options Hash. <tt>parse_find_args</tt>
-      # gets these arguments into a set that is easier to deal with.
-      def parse_find_args(*args)
-        request = args[0].kind_of?(QBFC::Request) ? args[0] : nil
-        options = args[-1].kind_of?(Hash) ? args[-1] : {}
-        
-        # base classes will need to pass a subset of options to
-        # the ChildClass.find . Also, the actually options to the
-        # BaseClass.find Request cannot include owner_id.
-        if is_base_class?
-          base_options = options.dup 
-          base_options.delete(:conditions)
-          options.delete(:owner_id)
-        else
-          base_options = nil
-        end
-        
-        return request, options, base_options
-      end
-      
-      private :parse_find_args, :base_class_find
+      private :base_class_find
 
     end
     
