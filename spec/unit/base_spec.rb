@@ -64,6 +64,10 @@ describe QBFC::Base do
     QBFC::Base.__send__(:create_query, @sess)
   end
   
+  it "should should respond to is_base_class? with false" do
+    QBFC::Base.is_base_class?.should be_false
+  end
+  
   describe ".parse_find_args" do
     before(:each) do
       @options = {:include_items => true, :owner_id => 0, :conditions => {}}

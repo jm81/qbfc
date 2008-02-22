@@ -41,6 +41,12 @@ class QBFC::Base
 
     end
     
+    # is_base_class? is used by Element and subclasses. It is included
+    # in Base because some Base methods may check for it.
+    def is_base_class? #:nodoc:
+      false
+    end
+    
     # Element::find and Info::get receive optional arguments which can include
     # a Request object and/or an options Hash. <tt>parse_find_args</tt>
     # gets these arguments into a set that is easier to deal with.
@@ -62,15 +68,13 @@ class QBFC::Base
       return request, options, base_options
     end
     
-    private :parse_find_args
-    
     # A convenience method for creating and returning
     # a Query Request for this class.
     def create_query(sess)
       QBFC::Request.new(sess, "#{qb_name}Query")
     end
     
-    private :create_query
+    protected :parse_find_args, :create_query
   
     # The QuickBooks name for this Element or Report.
     # It typically matches the last part of class name.
