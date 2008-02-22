@@ -168,7 +168,6 @@ describe QBFC::Request do
   describe "#filter_available?" do
     before(:each) do
       @request = QBFC::Request.new(@sess, 'CustomerQuery')
-      @request.instance_variable_set(:@request, @ole_request)
       
       @or_query = mock("OLEWrapper#or_query")
       @filter = mock("OLEWrapper#filter")
@@ -197,10 +196,20 @@ describe QBFC::Request do
     
   end
   
+  describe "#apply_options" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+    end
+  
+    it "accepts an :owner_id option" do
+      @request.should_receive(:add_owner_ids).with(1)
+      @request.apply_options(:owner_id => 1)
+    end
+  end
+  
   describe "#add_owner_ids" do
     before(:each) do
       @request = QBFC::Request.new(@sess, 'CustomerQuery')
-      @request.instance_variable_set(:@request, @ole_request)
       @owner_list = mock(QBFC::OLEWrapper)
     end
   
@@ -225,6 +234,3 @@ describe QBFC::Request do
     end
   end
 end
-
-
-
