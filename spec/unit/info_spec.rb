@@ -22,7 +22,7 @@ describe QBFC::Info do
     QBFC::Request.stub!(:new).with(@sess, 'CompanyQuery').and_return(@request)
     @request.stub!(:response).and_return(@response)
     QBFC::Test::Info.stub!(:new).with(@sess, @response).and_return(@info)
-    @request.stub!(:add_owner_ids)
+    @request.stub!(:apply_options)
   end
   
   describe ".get" do
@@ -33,14 +33,10 @@ describe QBFC::Info do
       QBFC::Test::Info::get(@sess)
     end
     
-    it "should have an includes option"
-    
-    it "accepts an :owner_id option" do    
-      @request.should_receive(:add_owner_ids).with(1)
-      QBFC::Test::Info::get(@sess, :owner_id => 1)
+    it "applies options to Request" do
+      @request.should_receive(:apply_options).with({:owner_id => 0})
+      QBFC::Test::Info::get(@sess, :owner_id => 0)
     end
-    
-    it "should accept a Request argument"
   end
   
   describe ".find" do

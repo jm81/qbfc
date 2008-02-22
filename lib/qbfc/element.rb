@@ -59,10 +59,7 @@ module QBFC
         # Setup q, options and base_options arguments
         q, options, base_options = parse_find_args(*args)
         q ||= create_query(sess)
-        
-        # Apply options - will probably change when I finish
-        # moving stuff out of Base
-        q = apply_options(sess, q, options)
+        q.apply_options(options)
         
         # QuickBooks only needs to return one record if .find is
         # only returning a single record.

@@ -39,7 +39,7 @@ describe QBFC::Element do
     @request.stub!(:filter).and_return(@filter)
     @filter.stub!(:max_returned=)
     @request.stub!(:filter_available?).and_return(true)
-    @request.stub!(:add_owner_ids)
+    @request.stub!(:apply_options)
   end
   
   def setup_request
@@ -101,10 +101,10 @@ describe QBFC::Element do
     it "generates a Request object if not given one"
     it "accepts conditions"
     
-    it "accepts an :owner_id option" do
+    it "applies options to request" do
       setup_request
-      @request.should_receive(:add_owner_ids).with(1)
-      QBFC::Test::ElementFind::find(@sess, :first, :owner_id => 1)
+      @request.should_receive(:apply_options).with({:owner_id => 0})
+      QBFC::Test::ElementFind::find(@sess, :first, :owner_id => 0)
     end
     
     it "passes additional arguments to Request"

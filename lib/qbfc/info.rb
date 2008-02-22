@@ -21,8 +21,7 @@ module QBFC
         # Setup q, options and base_options arguments
         q, options, base_options = parse_find_args(*args)
         q ||= create_query(sess)
-        
-        q.add_owner_ids(options.delete(:owner_id))
+        q.apply_options(options)
         
         new(sess, q.response)
       end
