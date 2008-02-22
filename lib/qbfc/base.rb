@@ -48,6 +48,8 @@ class QBFC::Base
 
     end
     
+    # A convenience method for creating and returning
+    # a Query Request for this class.
     def create_query(sess)
       QBFC::Request.new(sess, "#{qb_name}Query")
     end

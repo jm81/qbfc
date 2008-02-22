@@ -58,4 +58,9 @@ describe QBFC::Base do
   it "aliases qb_name class method as an instance method" do
     @base.qb_name.should == QBFC::Base.qb_name
   end
+  
+  it "should create_query" do
+    QBFC::Request.should_receive(:new).with(@sess, "BaseQuery")
+    QBFC::Base.__send__(:create_query, @sess)
+  end
 end
