@@ -1,0 +1,48 @@
+These are notes from a "survey" through possible options for Query Requests.
+This is intended to inform what specs are added to Request (particularly 
+#apply_options and the methods it calls).
+
+lists
+  - list_id_list
+  - full_name_list
+  - txn_id_list
+  - ref_number_list
+  - ref_number_case_sensitive_list
+  
+filters
+  - max_returned (alias limit)
+  - active_status (alias active)
+  
+  - from_modified_date (for lists)
+  - to_modified_date (for lists)
+  
+  - ORDateRangeFilter
+    - modified_date_range_filter (from and to)
+    - txn_date_range_filter (from and to OR macro)
+
+  - entity_filter / account_filter / item_filter (all ORs)
+    - ListIDList, FullNameList, ListIDWithChildren, FullNameWithChildren
+
+  - ORNameFilter / ORRefNumFilter
+    - name_filter (has criterion and name)
+    - name_range_filter (from and to)
+  
+  - time_tracking_entity_filter
+  
+  - ItemRef
+    
+  - account_type_list
+  
+  - txn_filter_no_account (SalesOrder)
+  
+  - pending_status
+  - paid_status
+  - done_status
+  
+TransactionQuery has a bunch of extras
+  
+includes
+  - include_ret_element_list
+  - include_line_items
+  - include_linked_txns
+  - IncludeComponentLineItems
