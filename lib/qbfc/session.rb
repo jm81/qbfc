@@ -11,32 +11,29 @@ module QBFC
   end
   class NotSavableError < RuntimeError#:nodoc:
   end
-end
 
-# Encapsulates a QBFC session.
-# 
-#   QBFC::Session.open(:app_name => 'Test Application') do |qb|
-#     qb.customers.find(:all).each do |customer|
-#       puts customer.full_name
-#     end
-#   end
-# 
-#   qb = QBFC::Session.new(:app_name => 'Test Application')
-#   qb.customers.find(:all).each do |customer|
-#     puts customer.full_name
-#   end
-#   qb.close
-# 
-# A QBFC::Session abstracts the ole_methods so that more conventional Ruby method names are used,
-# e.g. <tt>full_name</tt> instead of <tt>FullName.GetValue()</tt>.
-# 
-# This also allows a shortcut for setting up Quickbooks objects:
-# 
-# - session.customers.find(:all) instead of QBFC::Customer.find(session, :all)
-# - session.customer('CustomerFullName') instead of QBFC::Customer.find(session, 'CustomerFullName')
-# - session.customer instead of QBFC::Customer.find(session, :first)
-
-module QBFC
+  # Encapsulates a QBFC session.
+  # 
+  #   QBFC::Session.open(:app_name => 'Test Application') do |qb|
+  #     qb.customers.find(:all).each do |customer|
+  #       puts customer.full_name
+  #     end
+  #   end
+  # 
+  #   qb = QBFC::Session.new(:app_name => 'Test Application')
+  #   qb.customers.find(:all).each do |customer|
+  #     puts customer.full_name
+  #   end
+  #   qb.close
+  # 
+  # A QBFC::Session abstracts the ole_methods so that more conventional Ruby method names are used,
+  # e.g. <tt>full_name</tt> instead of <tt>FullName.GetValue()</tt>.
+  # 
+  # This also allows a shortcut for setting up Quickbooks objects:
+  # 
+  # - session.customers.find(:all) instead of QBFC::Customer.find(session, :all)
+  # - session.customer('CustomerFullName') instead of QBFC::Customer.find(session, 'CustomerFullName')
+  # - session.customer instead of QBFC::Customer.find(session, :first)
   class Session
     class << self
       

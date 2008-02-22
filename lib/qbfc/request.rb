@@ -76,6 +76,8 @@ module QBFC
         self.query.ole_object.ortype == 2
     end
     
+    # Applies options from a Hash. This method is primarily experimental
+    # (and proof of concept) at this time.
     def apply_options(options)      
       if options.kind_of? Hash
         filters = options[:conditions]

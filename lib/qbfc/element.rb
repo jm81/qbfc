@@ -50,6 +50,10 @@ module QBFC
       # The options hash accepts the following:
       # - <tt>:owner_id</tt>: One or more OwnerIDs, used in accessing
       #   custom fields (aka private data extensions).
+      # 
+      # Additional options are planned, but not really supported in this version.
+      # Passing a Request object is the current recommended way of applying
+      # Filters or other options to the Query Request.
       def find(sess, what, *args)
         
         if what.kind_of?(String) # Single FullName or ListID
