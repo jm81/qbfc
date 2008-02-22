@@ -51,7 +51,7 @@ end
 desc 'Generate documentation for the qbfc library.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Ruby QBFC'
+  rdoc.title    = 'QBFC-Ruby'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
@@ -70,9 +70,9 @@ spec = Gem::Specification.new do |s|
   s.rubyforge_project = "qbfc"
   s.platform = Gem::Platform::CURRENT
   s.summary = "A wrapper around the QBFC COM object of the Quickbooks SDK"
-  s.files = FileList["{bin,spec,lib}/**/*"].exclude("rdoc").to_a
+  s.files = FileList['lib/**/*.rb', 'bin/*', '[A-Z]*', 'spec/*.opts', 'spec/*.rb', 'spec/unit/**/*'].to_a
   s.require_path = "lib"
-  # s.test_file = ""
+  s.test_files = Dir.glob('spec/unit/**/*_spec.rb')
   s.has_rdoc = true
   s.extra_rdoc_files = ["README"]
 end
