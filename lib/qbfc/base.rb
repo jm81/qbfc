@@ -1,15 +1,8 @@
 class QBFC::Base
   class << self
   
-    def find_base(sess, what, *args)
+    def apply_options(sess, q, options)
         
-        if args[0].kind_of?(QBFC::Request)
-          q = args[0]
-        else
-          q = create_query(sess)
-        end
-        
-        options = args[-1]
         if options.kind_of? Hash
           filters = options[:conditions]
           if filters
@@ -54,23 +47,7 @@ class QBFC::Base
       QBFC::Request.new(sess, "#{qb_name}Query")
     end
     
-    def create_entity(sess, r, query_options = {})
-      ret = get_entity_ret(sess, r)
-      if query_options.empty?
-        ret
-      else
-        ret.class.find_by_list_id(sess, ret.ListID.GetValue(), query_options)
-      end
-    end
-    
-    def get_entity_ret(sess, r)
-      return QBFC::Vendor.new(sess, r.VendorRet) if r.VendorRet
-      return QBFC::Employee.new(sess, r.EmployeeRet) if r.EmployeeRet
-      return QBFC::OtherName.new(sess, r.OtherNameRet) if r.OtherNameRet
-      return QBFC::Customer.new(sess, r.CustomerRet) if r.CustomerRet
-    end
-    
-    private :create_query, :create_entity, :get_entity_ret
+    private :create_query
   
     # The QuickBooks name for this Element or Report.
     # It typically matches the last part of class name.

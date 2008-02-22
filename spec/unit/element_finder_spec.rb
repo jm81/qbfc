@@ -4,6 +4,8 @@ module QBFC::Test
   class BaseFind < QBFC::Element
     is_base_class
     
+    ID_NAME = "ListID"
+    
     def self.qb_name
       "Entity"
     end
@@ -28,6 +30,8 @@ describe QBFC::Element do
     
     # Request related mocks
     @request = mock("QBFC::Request")
+    @request.stub!(:kind_of?).with(QBFC::Request).and_return(true)
+    @request.stub!(:kind_of?).with(Hash).and_return(false)
     @response = mock("QBFC::Request#response")
     
     # Filter mock
@@ -39,7 +43,7 @@ describe QBFC::Element do
   end
   
   def setup_request
-    QBFC::Request.should_receive(:new).with(@sess, 'CheckQuery').and_return(@request)
+    QBFC::Request.stub!(:new).and_return(@request)
     @request.stub!(:response).and_return(@response)
     @response.stub!(:GetAt).and_return(@ole_wrapper)
     @response.stub!(:ole_methods).and_return(["GetAt"])
@@ -49,6 +53,7 @@ describe QBFC::Element do
   end
 
   describe ".find" do
+  
     it "should find_by_unique_id if the 'what' argument is neither :all nor :first" do
       QBFC::Test::ElementFind::should_receive(:find_by_unique_id).with(@sess, "123-456", {})
       QBFC::Test::ElementFind::find(@sess, "123-456", {})
@@ -108,6 +113,136 @@ describe QBFC::Element do
       setup_request
       @request.should_receive(:response).and_return(@response)    
       QBFC::Test::ElementFind::find(@sess, :first)
+    end
+    
+    it "should call base_class_find for base classes" do
+      QBFC::Request.stub!(:new).and_return(@request)
+      QBFC::Test::BaseFind.should_receive(:base_class_find).with(@sess, :first, @request, {}).and_return(@element)
+      QBFC::Test::BaseFind::find(@sess, :first, {}).should be(@element)
+    end
+    
+    it "should not call base_class_find for non-base classes" do
+      setup_request
+      QBFC::Test::ElementFind.should_not_receive(:base_class_find)
+      QBFC::Test::ElementFind::find(@sess, :first, {})      
+    end
+  end
+
+  describe ".base_class_find" do
+    before(:each) do
+      @request.stub!(:IncludeRetElementList).and_return(@include_list)
+      @include_list.stub!(:Add).with("ListID")
+      @request.stub!(:response).and_return(@response)
+      QBFC::Request.stub!(:new).and_return(@request)
+      
+      @element = mock(QBFC::Test::ElementFind)
+      @base_element = mock(QBFC::Test::BaseFind)
+      @customer_ret = mock("CustomerRet")
+      @base_element.stub!(:ole_methods).and_return(["CustomerRet"])
+      @base_element.stub!(:CustomerRet).and_return(@customer_ret)
+      @customer_ret.stub!(:ListID).and_return("123-456")
+      QBFC::Customer.stub!(:find_by_id).and_return(@element)
+
+      @response.stub!(:GetAt).and_return(@base_element)
+      @response.stub!(:Count).and_return(2)
+    end
+
+    it "should request only ListID" do
+      @include_list.should_receive(:Add).with("ListID")
+      QBFC::Test::BaseFind.find(@sess, :first, @request, {})
+    end
+    
+    it "should send class ChildList::find_by_id with ListID and find options for each" do
+      @base_element.should_receive(:CustomerRet).at_least(:once).and_return(@customer_ret)
+      @customer_ret.should_receive(:ListID).at_least(:once).and_return("789-012")
+      QBFC::Customer.should_receive(:find_by_id).at_least(:once).with(@sess, "789-012", {}).and_return(@element)
+      QBFC::Test::BaseFind.find(@sess, :first, @request, {}).should be(@element)
+    end
+    
+    it "should return nil if no records and not :all" do
+      @request.should_receive(:response).and_return(nil)
+      QBFC::Test::BaseFind.find(@sess, :first, @request, {}).should be_nil
+    end
+    
+    it "should return nil if no records and not :all" do
+      @request.should_receive(:response).and_return(nil)
+      QBFC::Test::BaseFind.find(@sess, :all, @request, {}).should == []
+    end    
+    
+    it "should return single record unless :all" do
+      QBFC::Test::BaseFind.find(@sess, :first, @request, {}).should be(@element)
+    end
+    
+    it "should return Array if :all" do
+      QBFC::Test::BaseFind.find(@sess, :all, @request, {}).should == [@element, @element]
+    end
+  end
+
+  describe ".parse_find_args" do
+    before(:each) do
+      @options = {:include_items => true, :owner_id => 0, :conditions => {}}
+    end
+  
+    it "should return a Request object if given one" do
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @request, @options)
+      rq.should be(@request)
+      
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @request)
+      rq.should be(@request)
+    end
+    
+    it "should return nil request if no Request given" do
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @options)
+      rq.should be_nil
+
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args)
+      rq.should be_nil
+    end
+    
+    it "should return options if given them" do
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @request, @options)
+      opt.should be(@options)
+      
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @options)
+      opt.should be(@options)
+    end
+    
+    it "should return an empty hash for options if not given them" do
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @request)
+      opt.should == {}
+      
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args)
+      opt.should == {}
+    end
+    
+    it "should return base_options if is_base_class?" do
+      rq, opt, base_opt = QBFC::Test::BaseFind.__send__(:parse_find_args, {})
+      base_opt.should == {}
+    end
+    
+    it "should make base_options and options separate objects" do
+      rq, opt, base_opt = QBFC::Test::BaseFind.__send__(:parse_find_args, @options)
+      base_opt.should_not be(opt)
+    end
+    
+    it "should return nil for base_options if isn't a base class" do
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, {})
+      base_opt.should be_nil
+    end
+    
+    it "should delete :conditions from base_options" do
+      rq, opt, base_opt = QBFC::Test::BaseFind.__send__(:parse_find_args, @options)
+      base_opt.should == {:include_items => true, :owner_id => 0}
+    end
+
+    it "should delete :owner_id from options if a base class" do
+      rq, opt, base_opt = QBFC::Test::BaseFind.__send__(:parse_find_args, @options)
+      opt.should == {:include_items => true, :conditions => {}}    
+    end
+    
+    it "should not delete :owner_id if not a base class" do
+      rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @options)
+      opt.should == {:include_items => true, :owner_id => 0, :conditions => {}}
     end
   end
 end

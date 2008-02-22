@@ -39,19 +39,44 @@ module QBFC
       # - <tt>:finds</tt> - finds all records fitting any given conditions.
       # - An unique identifier, such as a ListID, FullName, RefNumber or TxnID
       # 
-      # .find also accepts the follow options as a hash:
+      # .find can also receive a optional Request object followed 
+      # by an optional options Hash. Valid argument sets are:
+      # 
+      #   QBFC::Vendor.find(session, :first)
+      #   QBFC::Vendor.find(session, :first, request)
+      #   QBFC::Vendor.find(session, :first, request, options)
+      #   QBFC::Vendor.find(session, :first, options)
+      # 
+      # The options hash accepts the following:
       # - <tt>:owner_id</tt>: One or more OwnerIDs, used in accessing
       #   custom fields (aka private data extensions).
       def find(sess, what, *args)
+        
         if what.kind_of?(String) # Single FullName or ListID
           return find_by_unique_id(sess, what, *args)
         end
-
-        q = find_base(sess, what, *args)
         
+        # Setup q, options and base_options arguments
+        q, options, base_options = parse_find_args(*args)
+        q ||= create_query(sess)
+        
+        # Apply options - will probably change when I finish
+        # moving stuff out of Base
+        q = apply_options(sess, q, options)
+        
+        # QuickBooks only needs to return one record if .find is
+        # only returning a single record.
         if what == :first && q.filter_available?
           q.filter.max_returned = 1
         end
+        
+        # Send the query so far to base_class_find if this is
+        # a base class to handle special base class functionality.
+        return base_class_find(sess, what, q, base_options) if is_base_class?
+        
+        # Get response and return an Array, a QBFC::Element-inherited
+        # object, or nil, depending on <tt>what</tt> argument and whether
+        # the query returned any records.
         list = q.response
         
         if list.nil?
@@ -64,11 +89,64 @@ module QBFC
           new(sess, list.GetAt(0))
         end
       end
+      
+      # Base classes can be used to find members of any of their
+      # inherited classes. Since QuickBooks has limited options
+      # for these type of queries (in particular, no custom fields
+      # are returned), an initial query is run which retrieves
+      # only IDs and the class type and then individual subsequent
+      # queries are run for each returned object.
+      def base_class_find(sess, what, q, options)
+        q.IncludeRetElementList.Add(self::ID_NAME)
+        list = q.response
+        
+        if list.nil?
+          (what == :all) ? [] : nil
+        else
+          ary = (0..(list.Count - 1)).collect { |i|
+            element = list.GetAt(i)
+            ret_name = element.ole_methods.detect{ |m| m.to_s =~ /(.*)Ret\Z/ }.to_s
+            ret_class = QBFC::const_get($1)
+            ret_class.find(sess, element.send(ret_name).send(ret_class::ID_NAME), options.dup)
+          }
+          
+          if what == :all
+            ary
+          else
+            ary[0]
+          end
+        end
+      end
+      
+      # <tt>find</tt> receives some optional arguments which can include
+      # a Request object and/or an options Hash. <tt>parse_find_args</tt>
+      # gets these arguments into a set that is easier to deal with.
+      def parse_find_args(*args)
+        request = args[0].kind_of?(QBFC::Request) ? args[0] : nil
+        options = args[-1].kind_of?(Hash) ? args[-1] : {}
+        
+        # base classes will need to pass a subset of options to
+        # the ChildClass.find . Also, the actually options to the
+        # BaseClass.find Request cannot include owner_id.
+        if is_base_class?
+          base_options = options.dup 
+          base_options.delete(:conditions)
+          options.delete(:owner_id)
+        else
+          base_options = nil
+        end
+        
+        return request, options, base_options
+      end
+      
+      private :parse_find_args, :base_class_find
 
     end
     
     is_base_class
     
+    # Extends Base#initialize to allow for an Add Request if
+    # .new is called directly (instead of by .find)
     def initialize(sess, ole_object = nil)
       if self.class.is_base_class?
         raise BaseClassNewError, "This is a base class which doesn't allow object initialization"

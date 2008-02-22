@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + '/voidable'
 module QBFC
   class Transaction < Element
     is_base_class
+    ID_NAME = "TxnID"
     
     class << self
       

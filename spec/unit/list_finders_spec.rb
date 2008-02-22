@@ -35,13 +35,6 @@ describe QBFC::List do
     @response.stub!(:GetAt).with(0).and_return(@ole_wrapper)
     @response.stub!(:ole_methods).and_return(["GetAt"])
   end
-
-  describe ".find" do    
-    describe ".find(for base_class Lists)" do 
-      it "should request only ListID"
-      it "should send class ChildList::find_by_id with ListID and find options for each"
-    end  
-  end
   
   describe ".find_by_name" do    
     before(:each) do 

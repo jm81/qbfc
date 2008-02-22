@@ -10,9 +10,11 @@ describe "QBFC::Element(finders)" do
   after(:each) do 
     @integration.close
   end
-
-  it "return nil if no found is found when one is expected" do
-    QBFC::Customer.find(@sess, "No Customer").should be_nil
+  
+  it "should return a subclass of a base_class (e.g. Entity)" do
+    entity = QBFC::Entity.find(@sess, "Bob Customer")
+    entity.should be_kind_of(QBFC::Customer)
+    entity.name.should == "Bob Customer"
   end
   
 end

@@ -5,6 +5,7 @@ module QBFC
   # but it fits with the SDK's naming scheme, and I couldn't think of a better one.
   class List < Element
     is_base_class
+    ID_NAME = "ListID"
     
     class << self
       

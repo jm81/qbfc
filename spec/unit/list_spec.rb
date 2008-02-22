@@ -18,6 +18,12 @@ describe QBFC::List do
   
   it "should specify if it is a superclass_list (such as Entity)"
   
+  describe "::ID_NAME" do
+    it "should be 'ListID'" do
+      QBFC::Test::List::ID_NAME.should == "ListID"
+    end
+  end
+  
   describe "#id" do
     it "is an alias of list_id" do
       @ole_wrapper.should_receive(:list_id).and_return('L123')

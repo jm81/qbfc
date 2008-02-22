@@ -15,6 +15,12 @@ describe QBFC::Transaction do
     @ole_wrapper = mock(QBFC::OLEWrapper)
     @txn = QBFC::Test::Txn.new(@sess, @ole_wrapper)
   end
+  
+  describe "::ID_NAME" do
+    it "should be 'TxnID'" do
+      QBFC::Test::Txn::ID_NAME.should == "TxnID"
+    end
+  end
 
   describe "#id" do
     it "is an alias of txn_id" do
