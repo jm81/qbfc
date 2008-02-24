@@ -124,6 +124,12 @@ describe QBFC::Session do
     QBFC::QBCollection.should_receive(:new).with(@qb_sess, :QBClass).and_return(@collection)
     @qb_sess.classes.should == @collection
   end
+
+  it "should create QBFC::QBCollection for QBFC::Terms from #terms" do
+    @collection = mock(QBFC::QBCollection)
+    QBFC::QBCollection.should_receive(:new).with(@qb_sess, :Terms).and_return(@collection)
+    @qb_sess.terms.should == @collection
+  end
   
   it "should let OLEWrapper handle other unknown methods" do
     @ole_wrapper.should_receive(:qbfc_method_missing).with(@qb_sess, :FullName).and_return(true)

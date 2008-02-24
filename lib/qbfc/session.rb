@@ -114,8 +114,12 @@ module QBFC
     def method_missing(symbol, *params) #:nodoc:
       if (('a'..'z') === symbol.to_s[0].chr && symbol.to_s[-1].chr != '=')
         camelized_method = symbol.to_s.camelize.to_sym
-        single_camelized_method = symbol.to_s.singularize.camelize.to_sym
-        if QBFC.const_defined?(camelized_method)
+        if camelized_method.to_s =~ /Terms\Z/
+          single_camelized_method = camelized_method
+        else
+          single_camelized_method = symbol.to_s.singularize.camelize.to_sym 
+        end
+        if QBFC.const_defined?(camelized_method) && camelized_method.to_s !~ /Terms\Z/
           if params[0]
             return QBFC::const_get(camelized_method).find_by_unique_id(self, params[0])
           else
