@@ -138,9 +138,12 @@ describe QBFC::Element do
       @element = mock(QBFC::Test::ElementFind)
       @base_element = mock(QBFC::Test::BaseFind)
       @customer_ret = mock("CustomerRet")
-      @base_element.stub!(:ole_methods).and_return(["CustomerRet"])
+      @list_id = mock("ListID")
+      @base_element.stub!(:ole_methods).and_return(["VendorRet", "CustomerRet"])
+      @base_element.stub!(:VendorRet).and_return(nil)
       @base_element.stub!(:CustomerRet).and_return(@customer_ret)
-      @customer_ret.stub!(:ListID).and_return("123-456")
+      @customer_ret.stub!(:ListID).and_return(@list_id)
+      @list_id.stub!(:GetValue).and_return("123-456")
       QBFC::Customer.stub!(:find_by_id).and_return(@element)
 
       @response.stub!(:GetAt).and_return(@base_element)
@@ -154,7 +157,8 @@ describe QBFC::Element do
     
     it "should send class ChildList::find_by_id with ListID and find options for each" do
       @base_element.should_receive(:CustomerRet).at_least(:once).and_return(@customer_ret)
-      @customer_ret.should_receive(:ListID).at_least(:once).and_return("789-012")
+      @customer_ret.should_receive(:ListID).at_least(:once).and_return(@list_id)
+      @list_id.should_receive(:GetValue).at_least(:once).and_return("789-012")
       QBFC::Customer.should_receive(:find_by_id).at_least(:once).with(@sess, "789-012", {}).and_return(@element)
       QBFC::Test::BaseFind.find(@sess, :first, @request, {}).should be(@element)
     end

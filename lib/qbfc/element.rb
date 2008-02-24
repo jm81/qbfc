@@ -106,9 +106,11 @@ module QBFC
         else
           ary = (0..(list.Count - 1)).collect { |i|
             element = list.GetAt(i)
-            ret_name = element.ole_methods.detect{ |m| m.to_s =~ /(.*)Ret\Z/ }.to_s
+            ret_name = element.ole_methods.detect { |m|
+              m.to_s =~ /(.*)Ret\Z/ && element.send(m.to_s)
+            }.to_s
             ret_class = QBFC::const_get($1)
-            ret_class.find(sess, element.send(ret_name).send(ret_class::ID_NAME), options.dup)
+            ret_class.find(sess, element.send(ret_name).send(ret_class::ID_NAME).GetValue, options.dup)
           }
           
           if what == :all
