@@ -52,8 +52,9 @@ module QBFC
     
     def close
       @sess.close
+      sleep(1)
       unless @is_reader
-        sleep(5)
+        sleep(3)
         FileUtils.rm_rf(@dirname) 
       end
     end
