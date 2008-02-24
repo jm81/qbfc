@@ -5,7 +5,21 @@ allowing more or less direct access to the actual COM object.
 
 Obviously, test before using on your production data...
 
-==Examples
+==Relationships
+
+QBFC-Ruby supports loading of related records. These are records
+represented by "*Ref" in the QBFC documentation. For example, a Check
+has, among others, a PayeeEntityRef and an AccountRef. These can be
+accessed via, respectively, <tt>check.payee</tt> and <tt>check.account</tt>.
+
+<tt>check.payee.name</tt> returns the name of the payee.
+
+You can also access the *ID and Name fields of referenced records.
+Example: for the payee of a Check, <tt>check.payee_id</tt> and
+<tt>check.payee_name</tt>.
+	
+
+==General Examples
 
   # A very simple example, finding a single Customer by name
   QBFC::session do | qb |
