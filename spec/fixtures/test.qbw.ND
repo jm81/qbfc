@@ -2,7 +2,7 @@
 // to a company file. Do not delete this file yourself. QuickBooks may not
 // operate correctly IF you manually delete this file.
 [NetConnect]
-ServerIp=192.168.27.101
+ServerIp=192.168.120.114
 EngineName=QB_JEMLAPTOP_17
 ServerPort=10172
 FilePath=C:\Documents and Settings\Owner\Desktop\test.qbw

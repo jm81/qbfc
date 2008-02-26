@@ -83,24 +83,21 @@ module QBFC
         filters = options[:conditions]
         if filters
           if filters[:txn_date]
-            txn_date_filter = q.ORTxnQuery.TxnFilter.ORDateRangeFilter.TxnDateRangeFilter.ORTxnDateRangeFilter.TxnDateFilter
+            txn_date_filter = filter.ORDateRangeFilter.TxnDateRangeFilter.ORTxnDateRangeFilter.TxnDateFilter
             txn_date_filter.FromTxnDate.SetValue( filters[:txn_date][0] ) if filters[:txn_date][0]
             txn_date_filter.ToTxnDate.SetValue( filters[:txn_date][1] ) if filters[:txn_date][1]
             filters.delete(:txn_date)
           end
           
           if filters[:ref_number]
-            ref_num_filter = q.send("OR#{self.qb_name}Query").send("#{self.qb_name}Filter").
-                             ORRefNumberFilter.RefNumberRangeFilter
+            ref_num_filter = filter.ORRefNumberFilter.RefNumberRangeFilter
             ref_num_filter.FromRefNumber.SetValue( filters[:ref_number][0] ) if filters[:ref_number][0]
             ref_num_filter.ToRefNumber.SetValue( filters[:ref_number][1] ) if filters[:ref_number][1]
             filters.delete(:ref_number)
           end
             
-          filters.each do |filter, value|
-            q.send("OR#{self.qb_name}Query").
-              send("#{self.qb_name}Filter").
-              send("#{filter}=", QBFC_CONST::PsNotPaidOnly)
+          filters.each do |key, value|
+            filter.send("#{key}=", QBFC_CONST::PsNotPaidOnly)
           end
             
           options.delete(:conditions)
@@ -109,7 +106,7 @@ module QBFC
         add_owner_ids(options.delete(:owner_id))
 
         options.each do |key, value|
-          q.send(key.to_s.camelize).SetValue(value)
+          self.send(key.to_s.camelize).SetValue(value)
         end
       end
     end
