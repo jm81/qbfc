@@ -199,12 +199,33 @@ describe QBFC::Request do
   describe "#apply_options" do
     before(:each) do
       @request = QBFC::Request.new(@sess, 'CustomerQuery')
+      @query = mock('Request#query')
+      @filter = mock('Request#filter')
+      @request.stub!(:query).and_return(@query)
     end
   
-    it "accepts an :owner_id option" do
+    it "should apply an :owner_id option" do
       @request.should_receive(:add_owner_ids).with(1)
       @request.apply_options(:owner_id => 1)
     end
+    
+    it "should apply lists to query" do
+      ref_number_list = mock('OLEWrapper#ref_number_list')
+      @query.should_receive(:RefNumberList).and_return(ref_number_list)
+      ref_number_list.should_receive(:Add).with('82')
+      ref_number_list.should_receive(:Add).with('1234')
+
+      @request.apply_options(:conditions => {:ref_number_list => %w{82 1234}})
+    end
+
+    it "should apply lists to query when given a single item" do
+      ref_number_list = mock('OLEWrapper#ref_number_list')
+      @query.should_receive(:RefNumberList).and_return(ref_number_list)
+      ref_number_list.should_receive(:Add).with('20')
+
+      @request.apply_options(:conditions => {:ref_number_list => '20'})
+    end
+    
   end
   
   describe "#add_owner_ids" do

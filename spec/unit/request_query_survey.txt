@@ -6,7 +6,7 @@ lists
   - list_id_list
   - full_name_list
   - txn_id_list
-  - ref_number_list
+  X ref_number_list
   - ref_number_case_sensitive_list
   
 filters

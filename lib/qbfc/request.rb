@@ -80,28 +80,43 @@ module QBFC
     # (and proof of concept) at this time.
     def apply_options(options)      
       if options.kind_of? Hash
-        filters = options[:conditions]
-        if filters
-          if filters[:txn_date]
+        conditions = options[:conditions] || {}
+        
+        conditions.each do | c_name, c_value |
+          c_name = c_name.to_s
+          
+          case c_name
+          when /list\Z/i
+            list = query.__send__(c_name.camelize)
+            c_value = [c_value] unless c_value.kind_of?(Array)
+            c_value.each { |i| list.Add(i) }
+          end
+        end
+        
+        # Old stuff - will delete
+        if conditions       
+          if conditions[:txn_date]
             txn_date_filter = filter.ORDateRangeFilter.TxnDateRangeFilter.ORTxnDateRangeFilter.TxnDateFilter
             txn_date_filter.FromTxnDate.SetValue( filters[:txn_date][0] ) if filters[:txn_date][0]
             txn_date_filter.ToTxnDate.SetValue( filters[:txn_date][1] ) if filters[:txn_date][1]
             filters.delete(:txn_date)
           end
           
-          if filters[:ref_number]
+          if conditions[:ref_number]
             ref_num_filter = filter.ORRefNumberFilter.RefNumberRangeFilter
             ref_num_filter.FromRefNumber.SetValue( filters[:ref_number][0] ) if filters[:ref_number][0]
             ref_num_filter.ToRefNumber.SetValue( filters[:ref_number][1] ) if filters[:ref_number][1]
             filters.delete(:ref_number)
           end
             
-          filters.each do |key, value|
-            filter.send("#{key}=", QBFC_CONST::PsNotPaidOnly)
+          conditions.each do |key, value|
+          #  filter.send("#{key}=", QBFC_CONST::PsNotPaidOnly)
           end
             
           options.delete(:conditions)
         end
+        
+        # End old stuff
           
         add_owner_ids(options.delete(:owner_id))
 
