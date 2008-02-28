@@ -37,7 +37,7 @@ describe QBFC::Element do
     # Filter mock
     @filter = mock("QBFC::OLEWrapper#Filter")
     @request.stub!(:filter).and_return(@filter)
-    @filter.stub!(:max_returned=)
+    @request.stub!(:add_limit)
     @request.stub!(:filter_available?).and_return(true)
     @request.stub!(:apply_options)
   end
@@ -66,16 +66,15 @@ describe QBFC::Element do
     
     it "should set request#max_returned to 1 if :first" do
       setup_request
-      @request.should_receive(:filter).and_return(@filter)
+      @request.should_receive(:add_limit).with(1)
       @request.stub!(:filter_available?).and_return(true)
-      @filter.should_receive(:max_returned=).with(1)
       QBFC::Test::ElementFind::find(@sess, :first)
     end
 
     it "should not set request#max_returned if not request.filter_available?" do
       setup_request
       @request.stub!(:filter_available?).and_return(false)
-      @request.should_not_receive(:filter)
+      @request.should_not_receive(:add_limit)
       QBFC::Test::ElementFind::find(@sess, :first)
     end
 

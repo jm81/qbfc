@@ -50,10 +50,15 @@ module QBFC
       # The options hash accepts the following:
       # - <tt>:owner_id</tt>: One or more OwnerIDs, used in accessing
       #   custom fields (aka private data extensions).
+      # - <tt>:limit</tt>: The maximum number of records to be returned.
+      # - <tt>:conditions</tt>: A hash of conditions (generally 'Filters' in
+      #   QuickBooks SDK. See below:
       # 
       # Additional options are planned, but not really supported in this version.
       # Passing a Request object is the current recommended way of applying
       # Filters or other options to the Query Request.
+      #   
+      # ==Conditions TODO
       def find(sess, what, *args)
         
         if what.kind_of?(String) # Single FullName or ListID
@@ -63,12 +68,13 @@ module QBFC
         # Setup q, options and base_options arguments
         q, options, base_options = parse_find_args(*args)
         q ||= create_query(sess)
+        
         q.apply_options(options)
         
         # QuickBooks only needs to return one record if .find is
         # only returning a single record.
         if what == :first && q.filter_available?
-          q.filter.max_returned = 1
+          q.add_limit(1)
         end
         
         # Send the query so far to base_class_find if this is

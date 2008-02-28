@@ -119,6 +119,7 @@ module QBFC
         # End old stuff
           
         add_owner_ids(options.delete(:owner_id))
+        add_limit(options.delete(:limit))
 
         options.each do |key, value|
           self.send(key.to_s.camelize).SetValue(value)
@@ -137,6 +138,11 @@ module QBFC
       ids.each do | id |
         @request.OwnerIDList.Add(id)
       end
+    end
+    
+    # Set MaxReturned to limit the number of records returned.
+    def add_limit(limit)
+      filter.max_returned = limit if limit
     end
     
     # Send missing methods to @ole_object (OLEWrapper)

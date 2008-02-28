@@ -208,6 +208,11 @@ describe QBFC::Request do
       @request.should_receive(:add_owner_ids).with(1)
       @request.apply_options(:owner_id => 1)
     end
+
+    it "should apply an :limit option" do
+      @request.should_receive(:add_limit).with(1)
+      @request.apply_options(:limit => 1)
+    end
     
     it "should apply lists to query" do
       ref_number_list = mock('OLEWrapper#ref_number_list')
@@ -252,6 +257,19 @@ describe QBFC::Request do
       @ole_request.should_not_receive(:OwnerIDList)
       @owner_list.should_not_receive(:Add)
       @request.add_owner_ids(nil)
+    end
+  end
+  
+  describe "#add_limit" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+      @filter = mock('Request#filter')
+      @request.stub!(:filter).and_return(@filter)
+    end
+ 
+    it "can should update the filter's max_returned value" do
+      @filter.should_receive(:max_returned=).with(1)
+      @request.add_limit(1)
     end
   end
 end
