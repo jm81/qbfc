@@ -97,16 +97,16 @@ module QBFC
         if conditions       
           if conditions[:txn_date]
             txn_date_filter = filter.ORDateRangeFilter.TxnDateRangeFilter.ORTxnDateRangeFilter.TxnDateFilter
-            txn_date_filter.FromTxnDate.SetValue( filters[:txn_date][0] ) if filters[:txn_date][0]
-            txn_date_filter.ToTxnDate.SetValue( filters[:txn_date][1] ) if filters[:txn_date][1]
-            filters.delete(:txn_date)
+            txn_date_filter.FromTxnDate.SetValue( conditions[:txn_date][0] ) if conditions[:txn_date][0]
+            txn_date_filter.ToTxnDate.SetValue( conditions[:txn_date][1] ) if conditions[:txn_date][1]
+            conditions.delete(:txn_date)
           end
           
           if conditions[:ref_number]
             ref_num_filter = filter.ORRefNumberFilter.RefNumberRangeFilter
-            ref_num_filter.FromRefNumber.SetValue( filters[:ref_number][0] ) if filters[:ref_number][0]
-            ref_num_filter.ToRefNumber.SetValue( filters[:ref_number][1] ) if filters[:ref_number][1]
-            filters.delete(:ref_number)
+            ref_num_filter.FromRefNumber.SetValue( conditions[:ref_number][0] ) if conditions[:ref_number][0]
+            ref_num_filter.ToRefNumber.SetValue( conditions[:ref_number][1] ) if conditions[:ref_number][1]
+            conditions.delete(:ref_number)
           end
             
           conditions.each do |key, value|
