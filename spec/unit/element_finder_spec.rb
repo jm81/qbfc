@@ -96,9 +96,11 @@ describe QBFC::Element do
       QBFC::Test::ElementFind::find(@sess, :first).should be_nil
     end
     
-    it "can accept a Request object"
-    it "generates a Request object if not given one"
-    it "accepts conditions"
+    it "should call Base.parse_find_args" do
+      setup_request
+      QBFC::Test::ElementFind::should_receive(:parse_find_args).with({:option => true})
+      QBFC::Test::ElementFind::find(@sess, :all, {:option => true})
+    end
     
     it "applies options to request" do
       setup_request
@@ -106,8 +108,6 @@ describe QBFC::Element do
       QBFC::Test::ElementFind::find(@sess, :first, :owner_id => 0)
     end
     
-    it "passes additional arguments to Request"
-
     it "should get request#response" do
       setup_request
       @request.should_receive(:response).and_return(@response)    
