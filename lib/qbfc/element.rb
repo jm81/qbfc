@@ -56,9 +56,48 @@ module QBFC
       # 
       # Additional options are planned, but not really supported in this version.
       # Passing a Request object is the current recommended way of applying
-      # Filters or other options to the Query Request.
+      # unsupported conditions (Filters) or other options to the Query Request.
       #   
-      # ==Conditions TODO
+      # ==Conditions
+      # 
+      # Conditions are dependent on the particular Request. See the QuickBooks
+      # SDK documentation for applicable filters for each Query Request. Note
+      # that not all Filters are supported.
+      # 
+      # Typically the condition is given as :filter_name => value where
+      # +filter_name+ is the name of the filter less the word 'Filter' (see
+      # examples below).
+      # 
+      # Here are some general rules:
+      # 
+      # [List filters]
+      #   These are filters that end in List. They take an Array of values.
+      #   
+      #     :ref_number_list => ["1001", "1003", "1003a"]
+      #     :txn_id_list => ["123-456"]
+      # 
+      # [Range Filters]
+      #   Filters which take a range of values. These accept any
+      #   object which responds to +first+ and +last+, such as a Range or Array.
+      #   +first+ is used to set the From value, +last+ sets the To value. If a
+      #   scalar value is given (or a single element Array), To is set and From
+      #   is left empty. nil can also be given for either value.
+      # 
+      #     :txn_date_range => ['2008-01', nil]
+      #     :txn_date_range => ['2008-01']
+      #     :txn_date_range => '2008-01'
+      #     
+      #     :ref_number_range => "1001".."1003"
+      #     :ref_number_range => ["1001", "1003"]
+      #   
+      # [Reference Filters]
+      #   Filters which reference another object (belongs to
+      #   filters). These current only accept Name arguments, as a single value
+      #   or an Array.
+      # 
+      #     :account => 'Checking'
+      #     :entity => ['ABC Supplies', 'CompuStuff']
+      # 
       def find(sess, what, *args)
         
         if what.kind_of?(String) # Single FullName or ListID

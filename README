@@ -5,6 +5,15 @@ allowing more or less direct access to the actual COM object.
 
 Obviously, test before using on your production data...
 
+==Find
+
+QBFC-Ruby supports +find+ queries with options, which utitilize QBFC's Query
+Requests. See QBFC::Element.find for details and options.
+
+  QBFC::session do | qb |
+    checks = qb.checks.find(:first, :conditions => {:entity => 'ABC Supplies'})
+  end
+
 ==Relationships
 
 QBFC-Ruby supports loading of related records. These are records
@@ -17,7 +26,6 @@ accessed via, respectively, <tt>check.payee</tt> and <tt>check.account</tt>.
 You can also access the *ID and Name fields of referenced records.
 Example: for the payee of a Check, <tt>check.payee_id</tt> and
 <tt>check.payee_name</tt>.
-	
 
 ==General Examples
 
