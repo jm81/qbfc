@@ -21,15 +21,15 @@ describe "conditions: " do
     end
     
     it "should filter on date range" do
-      @sess.checks.find(:all, :conditions => {:txn_date_range => '2007-02-23'..'2007-02-25'}).length.should == 2
-      @sess.checks.find(:all, :conditions => {:txn_date_range => '2007-02-26'}).length.should == 3
-      @sess.checks.find(:all, :conditions => {:txn_date_range => Date.parse('2007-02-26')}).length.should == 3
+      @sess.checks.find(:all, :conditions => {:txn_date_range => '2008-02-23'..'2008-02-25'}).length.should == 1
+      @sess.checks.find(:all, :conditions => {:txn_date_range => '2008-02-26'}).length.should == 3
+      @sess.checks.find(:all, :conditions => {:txn_date_range => Date.parse('2008-02-26')}).length.should == 3
     end
     
     it "should filter on modified time" do
-      @sess.checks.find(:all, :conditions => {:modified_date_range => '2007-02-23'..'2007-02-25'}).length.should == 2
-      @sess.checks.find(:all, :conditions => {:modified_date_range => '2007-02-26'}).length.should == 3
-      @sess.checks.find(:all, :conditions => {:modified_date_range => Date.parse('2007-02-26')}).length.should == 3
+      @sess.checks.find(:all, :conditions => {:modified_date_range => '2008-02-23'..'2008-02-25'}).length.should == 1
+      @sess.checks.find(:all, :conditions => {:modified_date_range => '2008-02-26'}).length.should == 3
+      @sess.checks.find(:all, :conditions => {:modified_date_range => Date.parse('2008-02-26')}).length.should == 3
     end
     
     it "should filter on ref number criteria" do
@@ -41,12 +41,13 @@ describe "conditions: " do
     
     it "should filter on ref number range" do
       @sess.checks.find(:all, :conditions => {:ref_number_range => '1000'..'1001'}).length.should == 2
-      @sess.checks.find(:all, :conditions => {:ref_number_range => '1003'}).length.should == 1
+      @sess.checks.find(:all, :conditions => {:ref_number_range => 1000..1001}).length.should == 2
+      @sess.checks.find(:all, :conditions => {:ref_number_range => '1003'}).length.should >= 1
     end
     
     it "should filter on Entity" do
       @sess.checks.find(:all, :conditions => {:entity => 'ABC Supplies'}).length.should >= 2
-      @sess.checks.find(:first, :conditions => {:entity => 'Computer Shop'}).ref_num.should == '1002'
+      @sess.checks.find(:first, :conditions => {:entity => 'Computer Shop'}).ref_number.should == '1002'
     end
     
     it "should filter on Account" do

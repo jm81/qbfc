@@ -231,6 +231,127 @@ describe QBFC::Request do
       @request.apply_options(:conditions => {:ref_number_list => '20'})
     end
     
+    describe "(range)" do
+      before(:each) do
+        @range_filter = mock('Request#TxnDateRangeFilter')
+        @request.stub!(:filter_for).with('txn_date_range').and_return(@range_filter)
+        @range_filter.stub!(:from_txn_date=)
+        @range_filter.stub!(:to_txn_date=)
+      end
+    
+      it "should #parse_range_value" do
+        @request.should_receive(:parse_range_value).with([0,2]).and_return([0,2])
+        @request.apply_options(:conditions => {:txn_date_range => [0,2]})
+      end
+      
+      it "should get appropriate filter" do
+        @request.should_receive(:filter_for).with('txn_date_range').and_return(@range_filter)
+        @request.apply_options(:conditions => {:txn_date_range => [0,2]})
+      end
+      
+      it "should apply date range to filter" do
+        @range_filter.stub!(:from_txn_date=).with(0)
+        @range_filter.stub!(:to_txn_date=).with(2)
+        @request.apply_options(:conditions => {:txn_date_range => [0,2]})
+      end
+
+      it "should add 'true' argument (asDateOnly) for modified_date ranges" do
+        @range_filter.stub!(:from_txn_date=).with(0, true)
+        @range_filter.stub!(:to_txn_date=).with(2, true)
+        @request.apply_options(:conditions => {:txn_date_range => [0,2]})
+      end
+    end
+  end
+  
+  describe "#parse_range_value" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+    end
+
+    it "should add a nil element to a one-element Array" do
+      ary = [0]
+      @request.__send__(:parse_range_value, ary).should == [0, nil]
+    end
+    
+    it "should return unchanged a multiple element Array" do
+      ary = [0, 1]
+      @request.__send__(:parse_range_value, ary).should be(ary)
+    end
+    
+    it "should return unchanged a Range" do
+      rng = 0..1
+      @request.__send__(:parse_range_value, rng).should be(rng)
+    end
+    
+    it "should take a scalar and return an array with the second element nil" do
+      val = 0
+      @request.__send__(:parse_range_value, val).should == [val, nil]
+    end
+    
+    it "should take a String scalar and return an array with the second element nil" do
+      val = '0'
+      @request.__send__(:parse_range_value, val).should == [val, nil]
+    end
+  
+  end
+  
+  describe "#filter_for" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+      @query = mock('Request#query')
+      @filter = mock('Request#filter')
+      @request.stub!(:query).and_return(@query)
+      @request.stub!(:filter).and_return(@filter)
+
+      @or_date_range_filter = mock('Request#ORDateRangeFilter')
+      @or_ref_number_filter = mock('Request#ORRefNumberFilter')
+      @txn_date_range_filter = mock('Request#TxnDateRangeFilter')
+      @final_filter = mock('Request#FinalFilter')
+      @final_filter.stub!(:respond_to_ole?).and_return(false)
+      
+      @filter.stub!(:respond_to_ole?).and_return(false)
+    end
+  
+    it "should follow ORDateRangeFilter for date_ranges" do
+      @filter.should_receive(:respond_to_ole?).with('ORDateRangeFilter').and_return(true)
+      @filter.should_receive(:ORDateRangeFilter).and_return(@or_date_range_filter)
+      @or_date_range_filter.should_receive(:ModifiedDateRangeFilter).and_return(@final_filter)
+      
+      @request.__send__(:filter_for, 'modified_date_range').should be(@final_filter)
+    end
+
+    it "should follow OR{name}Filter" do
+      @filter.should_receive(:respond_to_ole?).with('ORRefNumberFilter').and_return(true)
+      @filter.should_receive(:ORRefNumberFilter).and_return(@or_ref_number_filter)
+      @or_ref_number_filter.should_receive(:RefNumberFilter).and_return(@final_filter)
+      
+      @request.__send__(:filter_for, 'ref_number').should be(@final_filter)
+    end
+    
+    it "should follow OR{name}Filter, with 'Range' removed" do
+      @filter.should_receive(:respond_to_ole?).with('ORRefNumberFilter').and_return(true)
+      @filter.should_receive(:ORRefNumberFilter).and_return(@or_ref_number_filter)
+      @or_ref_number_filter.should_receive(:RefNumberRangeFilter).and_return(@final_filter)
+      
+      @request.__send__(:filter_for, 'ref_number_range').should be(@final_filter)
+    end
+    
+    it "should return #filter if *ModifiedDate in #filter" do
+      @filter.should_receive(:respond_to_ole?).with('FromModifiedDate').and_return(true)
+      @request.__send__(:filter_for, 'modified_date_range').should == @filter
+    end
+    
+    it "should follow OR below the Filter" do
+      @filter.should_receive(:respond_to_ole?).with('TxnDateRangeFilter').and_return(true)
+      @filter.should_receive(:TxnDateRangeFilter).and_return(@txn_date_range_filter)
+      
+      @txn_date_range_filter.should_receive(:respond_to_ole?).with('ORTxnDateRangeFilter').and_return(true)
+      @txn_date_range_filter.should_receive(:ORTxnDateRangeFilter).and_return(@or_date_range_filter)
+      
+      @or_date_range_filter.should_receive(:TxnDateFilter).and_return(@final_filter)
+      
+      @request.__send__(:filter_for, 'txn_date_range').should be(@final_filter)
+    end
   end
   
   describe "#add_owner_ids" do

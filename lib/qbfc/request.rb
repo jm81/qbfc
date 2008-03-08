@@ -75,7 +75,7 @@ module QBFC
       self.query.ole_object.ortype == -1 ||
         self.query.ole_object.ortype == 2
     end
-    
+       
     # Applies options from a Hash. This method is primarily experimental
     # (and proof of concept) at this time.
     def apply_options(options)      
@@ -90,24 +90,24 @@ module QBFC
             list = query.__send__(c_name.camelize)
             c_value = [c_value] unless c_value.kind_of?(Array)
             c_value.each { |i| list.Add(i) }
+          when /range\Z/i
+            c_value = parse_range_value(c_value)
+            range_filter = filter_for(c_name)
+            range_name = c_name.match(/(.*)_range\Z/i)[1]
+            if range_name == 'modified_date'
+              # Modified Date Range use the IQBDateTimeType which requires a\
+              # boolean 'asDateOnly' value.
+              range_filter.__send__("from_#{range_name}=", c_value.first, true) if c_value.first
+              range_filter.__send__("to_#{range_name}=", c_value.last, true) if c_value.last
+            else
+              range_filter.__send__("from_#{range_name}=", c_value.first) if c_value.first
+              range_filter.__send__("to_#{range_name}=", c_value.last) if c_value.last
+            end
           end
         end
         
         # Old stuff - will delete
         if conditions       
-          if conditions[:txn_date]
-            txn_date_filter = filter.ORDateRangeFilter.TxnDateRangeFilter.ORTxnDateRangeFilter.TxnDateFilter
-            txn_date_filter.FromTxnDate.SetValue( conditions[:txn_date][0] ) if conditions[:txn_date][0]
-            txn_date_filter.ToTxnDate.SetValue( conditions[:txn_date][1] ) if conditions[:txn_date][1]
-            conditions.delete(:txn_date)
-          end
-          
-          if conditions[:ref_number]
-            ref_num_filter = filter.ORRefNumberFilter.RefNumberRangeFilter
-            ref_num_filter.FromRefNumber.SetValue( conditions[:ref_number][0] ) if conditions[:ref_number][0]
-            ref_num_filter.ToRefNumber.SetValue( conditions[:ref_number][1] ) if conditions[:ref_number][1]
-            conditions.delete(:ref_number)
-          end
             
           conditions.each do |key, value|
           #  filter.send("#{key}=", QBFC_CONST::PsNotPaidOnly)
@@ -125,8 +125,7 @@ module QBFC
           self.send(key.to_s.camelize).SetValue(value)
         end
       end
-    end
-    
+    end    
     
     # Add one or more OwnerIDs to the Request. Used in retrieving
     # custom fields (aka private data extensions).
@@ -144,6 +143,57 @@ module QBFC
     def add_limit(limit)
       filter.max_returned = limit if limit
     end
+    
+    # Parse a value for a range filter. This can be a Range, a one or more
+    # element Array or a single value. For a single value or one-element array
+    # value#last should return nil. The calling method (#apply_options) will
+    # call value#first and value#last to set the from and to values
+    # respectively.
+    def parse_range_value(value)
+      value << nil if value.kind_of?(Array) && value.length == 1
+      value = [value, nil] if (value.kind_of?(String) || !value.respond_to?(:first))
+      value
+    end
+    
+    # Determine and return the Filter object for the given filter name, dealing
+    # with OR's and other "weird" circumstances.
+    # NB: This method may well miss some situations. Hopefully, it will become
+    # more complete in time.
+    def filter_for(name)
+      name = name.camelize + "Filter"
+      f = nil
+      
+      # List queries place the modified_date_range directly in the filter
+      if name == 'ModifiedDateRangeFilter'
+        return filter if filter.respond_to_ole?('FromModifiedDate')
+      end
+      
+      # Try to get the filter directly
+      if filter.respond_to_ole?(name)
+        f = filter.send(name)
+      end
+      
+      # Check if this is within an 'OR'
+      if filter.respond_to_ole?("OR#{name}")
+        f = filter.send("OR#{name}").send(name)
+      elsif filter.respond_to_ole?("OR#{name.gsub(/Range/, '')}")
+        f = filter.send("OR#{name.gsub(/Range/, '')}").send(name)
+      end
+      
+      # DateRange OR's
+      if filter.respond_to_ole?("ORDateRangeFilter") && name =~ /DateRange/i
+        f = filter.send("ORDateRangeFilter").send(name)
+      end
+
+      # It might have a nested OR      
+      if f && f.respond_to_ole?("OR#{name}")
+        f = f.send("OR#{name}").send(name.gsub(/Range/, ''))
+      end
+      
+      return f
+    end
+    
+    private :parse_range_value, :filter_for
     
     # Send missing methods to @ole_object (OLEWrapper)
     def method_missing(symbol, *params) #:nodoc:

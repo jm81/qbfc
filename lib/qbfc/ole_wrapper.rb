@@ -103,6 +103,7 @@ module QBFC
       obj = @ole_object.send(ole_method_name)
 
       if detect_ole_method?(obj, "SetValue")
+        params[0] = params[0].strftime("%Y-%m-%d") if params[0].kind_of?(Date)
         obj.SetValue(*params)
         if @setter && detect_ole_method?(@setter, ole_method_name)
           @setter.send(ole_method_name).SetValue(*params)

@@ -140,6 +140,13 @@ describe QBFC::OLEWrapper do
       
       @wrapper.qbfc_method_missing(@sess, :full_name=, 'Full Name')
     end
+    
+    it "should convert Dates in setter method" do
+      @ole_object.should_receive(:TimeModified).and_return(@full_name)
+      @full_name.should_receive(:SetValue).with('2008-01-01')
+      
+      @wrapper.qbfc_method_missing(@sess, :time_modified=, Date.parse('2008-01-01'))
+    end
 
     it "should set @setter also when acting as a setter method, if applicable" do
       @setter = mock(WIN32OLE)
