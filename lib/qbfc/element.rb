@@ -166,7 +166,7 @@ module QBFC
         end
       end
       
-      private :base_class_find
+      private :base_class_find, :is_base_class
 
     end
     
