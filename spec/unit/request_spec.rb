@@ -235,6 +235,7 @@ describe QBFC::Request do
       before(:each) do
         @range_filter = mock('Request#TxnDateRangeFilter')
         @request.stub!(:filter_for).with('txn_date_range').and_return(@range_filter)
+        @request.stub!(:filter_for).with('modified_date_range').and_return(@range_filter)
         @range_filter.stub!(:from_txn_date=)
         @range_filter.stub!(:to_txn_date=)
       end
@@ -250,15 +251,46 @@ describe QBFC::Request do
       end
       
       it "should apply date range to filter" do
-        @range_filter.stub!(:from_txn_date=).with(0)
-        @range_filter.stub!(:to_txn_date=).with(2)
+        @range_filter.should_receive(:from_txn_date=).with(0)
+        @range_filter.should_receive(:to_txn_date=).with(2)
         @request.apply_options(:conditions => {:txn_date_range => [0,2]})
       end
 
       it "should add 'true' argument (asDateOnly) for modified_date ranges" do
-        @range_filter.stub!(:from_txn_date=).with(0, true)
-        @range_filter.stub!(:to_txn_date=).with(2, true)
-        @request.apply_options(:conditions => {:txn_date_range => [0,2]})
+        @range_filter.should_receive(:from_modified_date=).with(0, true)
+        @range_filter.should_receive(:to_modified_date=).with(2, true)
+        @request.apply_options(:conditions => {:modified_date_range => [0,2]})
+      end
+    end
+    
+    describe "(reference)" do
+      before(:each) do
+        @ref_filter = mock('Request#RefFilter')
+        @full_name_list = mock('OLEWrapper#FullNameList')
+        @request.stub!(:filter_for).with('entity').and_return(@ref_filter)
+        @ref_filter.should_receive(:FullNameList).at_least(:once).and_return(@full_name_list)
+        @full_name_list.stub!(:Add)
+      end
+    
+      it "should get appropriate filter" do
+        @request.should_receive(:filter_for).with('entity').and_return(@ref_filter)
+        @request.apply_options(:conditions => {:entity => 'ABC Supplies'})
+      end
+      
+      it "should set a single full name" do
+        @full_name_list.should_receive(:Add).with('ABC Supplies')
+        @request.apply_options(:conditions => {:entity => 'ABC Supplies'})
+      end
+
+      it "should set a single full name (non-string)" do
+        @full_name_list.should_receive(:Add).with(1)
+        @request.apply_options(:conditions => {:entity => 1})
+      end
+      
+      it "should set a multiple full names" do
+        @full_name_list.should_receive(:Add).with('ABC Supplies')
+        @full_name_list.should_receive(:Add).with('CompuStuff')
+        @request.apply_options(:conditions => {:entity => %w{ABC\ Supplies CompuStuff}})
       end
     end
   end
@@ -307,9 +339,10 @@ describe QBFC::Request do
       @or_ref_number_filter = mock('Request#ORRefNumberFilter')
       @txn_date_range_filter = mock('Request#TxnDateRangeFilter')
       @final_filter = mock('Request#FinalFilter')
-      @final_filter.stub!(:respond_to_ole?).and_return(false)
       
       @filter.stub!(:respond_to_ole?).and_return(false)
+      @or_date_range_filter.stub!(:respond_to_ole?).and_return(false)
+      @final_filter.stub!(:respond_to_ole?).and_return(false)
     end
   
     it "should follow ORDateRangeFilter for date_ranges" do
@@ -348,6 +381,17 @@ describe QBFC::Request do
       @txn_date_range_filter.should_receive(:respond_to_ole?).with('ORTxnDateRangeFilter').and_return(true)
       @txn_date_range_filter.should_receive(:ORTxnDateRangeFilter).and_return(@or_date_range_filter)
       
+      @request.__send__(:filter_for, 'txn_date_range').should be(@or_date_range_filter)
+    end
+
+    it "should get a nested Filter with 'Range' removed" do
+      @filter.should_receive(:respond_to_ole?).with('TxnDateRangeFilter').and_return(true)
+      @filter.should_receive(:TxnDateRangeFilter).and_return(@txn_date_range_filter)
+      
+      @txn_date_range_filter.should_receive(:respond_to_ole?).with('ORTxnDateRangeFilter').and_return(true)
+      @txn_date_range_filter.should_receive(:ORTxnDateRangeFilter).and_return(@or_date_range_filter)
+      
+      @or_date_range_filter.should_receive(:respond_to_ole?).with('TxnDateFilter').and_return(true)
       @or_date_range_filter.should_receive(:TxnDateFilter).and_return(@final_filter)
       
       @request.__send__(:filter_for, 'txn_date_range').should be(@final_filter)

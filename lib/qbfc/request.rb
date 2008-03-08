@@ -87,10 +87,12 @@ module QBFC
           
           case c_name
           when /list\Z/i
+            # List filters
             list = query.__send__(c_name.camelize)
             c_value = [c_value] unless c_value.kind_of?(Array)
             c_value.each { |i| list.Add(i) }
           when /range\Z/i
+            # Range filters
             c_value = parse_range_value(c_value)
             range_filter = filter_for(c_name)
             range_name = c_name.match(/(.*)_range\Z/i)[1]
@@ -102,6 +104,13 @@ module QBFC
             else
               range_filter.__send__("from_#{range_name}=", c_value.first) if c_value.first
               range_filter.__send__("to_#{range_name}=", c_value.last) if c_value.last
+            end
+          else
+            # Reference filters - Only using FullNameList for now
+            ref_filter = filter_for(c_name)
+            c_value = [c_value] unless c_value.respond_to?(:each)
+            c_value.each do | val |
+              ref_filter.FullNameList.Add(val)
             end
           end
         end
@@ -187,7 +196,12 @@ module QBFC
 
       # It might have a nested OR      
       if f && f.respond_to_ole?("OR#{name}")
-        f = f.send("OR#{name}").send(name.gsub(/Range/, ''))
+        f = f.send("OR#{name}")
+      end
+      
+      # Ranges might have another step, with the 'Range' removed.
+      if f && f.respond_to_ole?(name.gsub(/Range/, ''))
+        f = f.send(name.gsub(/Range/, ''))
       end
       
       return f
