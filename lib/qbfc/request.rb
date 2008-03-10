@@ -80,7 +80,7 @@ module QBFC
     # (see Element.find for details)
     def apply_options(options)      
       if options.kind_of? Hash
-        conditions = options[:conditions] || {}
+        conditions = options.delete(:conditions) || {}
         
         conditions.each do | c_name, c_value |
           c_name = c_name.to_s
@@ -105,6 +105,9 @@ module QBFC
               range_filter.__send__("from_#{range_name}=", c_value.first) if c_value.first
               range_filter.__send__("to_#{range_name}=", c_value.last) if c_value.last
             end
+          when /status\Z/i
+            # Status filters
+            filter.__send__("#{c_name}=", c_value)
           else
             # Reference filters - Only using FullNameList for now
             ref_filter = filter_for(c_name)
@@ -114,18 +117,6 @@ module QBFC
             end
           end
         end
-        
-        # Old stuff - will delete
-        if conditions       
-            
-          conditions.each do |key, value|
-          #  filter.send("#{key}=", QBFC_CONST::PsNotPaidOnly)
-          end
-            
-          options.delete(:conditions)
-        end
-        
-        # End old stuff
           
         add_owner_ids(options.delete(:owner_id))
         add_limit(options.delete(:limit))

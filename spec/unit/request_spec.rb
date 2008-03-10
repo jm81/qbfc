@@ -263,6 +263,15 @@ describe QBFC::Request do
       end
     end
     
+    describe "(status)" do
+      it "should set status" do
+        @filter = mock('Request#filter')
+        @request.stub!(:filter).and_return(@filter)
+        @filter.should_receive(:paid_status=).with(QBFC_CONST::PsPaidOnly)
+        @request.apply_options(:conditions => {:paid_status => QBFC_CONST::PsPaidOnly})
+      end
+    end
+    
     describe "(reference)" do
       before(:each) do
         @ref_filter = mock('Request#RefFilter')
