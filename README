@@ -59,5 +59,27 @@ Example: for the payee of a Check, <tt>check.payee_id</tt> and
     first_customer = customer_set.Detail[0]
     puts first_customer.full_name
   end
+  
+==Alternatives
+
+[QuickBooks for Ruby]
+  (docs: http://quickbooks.rubyforge.org,
+  homepage: http://rubyforge.org/projects/quickbooks)
+
+  This is a project with similar goals to QBFC-Ruby. I believe the approach
+  is creating Ruby classes that mirror the QuickBooks types and generate / parse
+  qbXML. In my opinion, this approach is more stable and flexible than what I'm
+  doing with QBFC-Ruby, but at the cost of slower development. (As in, QBFC-Ruby
+  was intended as a collection of quick and dirty shortcuts; QuickBooks for Ruby
+  seems to be intended as a much more *complete* project)
+
+[QBFC/qbXML COM Objects]
+  Using the SDK directly is an option. Unless you need to use QBWC (QuickBooks
+  Web Connector) or have some other reason for *wanting* to us qbXML, I suggest
+  using QBFC. The SDK documents (see http://developer.intuit.com/ ) are pretty
+  easy to use and navigate.
+
+There are some other libraries on rubyforge in early stages which I haven't
+really explored.
 
 Copyright (c) 2008 Jared E. Morgan, released under the MIT license
