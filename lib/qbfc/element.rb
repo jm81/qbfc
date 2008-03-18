@@ -51,13 +51,33 @@ module QBFC
       # - <tt>:owner_id</tt>: One or more OwnerIDs, used in accessing
       #   custom fields (aka private data extensions).
       # - <tt>:limit</tt>: The maximum number of records to be returned.
+      # - <tt>:include</tt>: Elements to include (see below for details)
       # - <tt>:conditions</tt>: A hash of conditions (generally 'Filters' in
       #   QuickBooks SDK. See below:
       # 
       # Additional options are planned, but not really supported in this version.
       # Passing a Request object is the current recommended way of applying
       # unsupported conditions (Filters) or other options to the Query Request.
-      #   
+      # 
+      # ==Include
+      # 
+      # The :include option accepts an Array of elements to include in the
+      # return of the Query. The array may include either or both of elements
+      # that are additional to normal returns (such as Line Items, Linked
+      # Transactions) or elements that are normally included (to be added to the
+      # IncludeRetElementList).
+      # 
+      # If elements are given that would be added to IncludeRetElementList, this
+      # limits the elements returned to *only* those included in the array.
+      # 
+      # Another option is to give :all as the argument, which will always return
+      # as many elements as possible.
+      # 
+      #   @sess.checks.find(:all, :include => [:linked_txns]) -> Include linked transactions
+      #   @sess.checks.find(:all, :include => [:txn_id]) -> Include +only+ TxnID
+      #   @sess.checks.find(:all, :include => :all) ->
+      #     Includes all elements, including LinkedTxns and LineItems.
+      #     
       # ==Conditions
       # 
       # Conditions are dependent on the particular Request. See the QuickBooks

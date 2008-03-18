@@ -214,6 +214,12 @@ describe QBFC::Request do
       @request.apply_options(:limit => 1)
     end
     
+    it "should apply an :include option" do
+      include_ary = [1,2,3]
+      @request.should_receive(:add_includes).with(include_ary)
+      @request.apply_options(:include => include_ary)
+    end
+    
     it "should apply lists to query" do
       ref_number_list = mock('OLEWrapper#ref_number_list')
       @query.should_receive(:RefNumberList).and_return(ref_number_list)
@@ -301,6 +307,37 @@ describe QBFC::Request do
         @full_name_list.should_receive(:Add).with('CompuStuff')
         @request.apply_options(:conditions => {:entity => %w{ABC\ Supplies CompuStuff}})
       end
+    end
+  end
+  
+  describe "#add_includes" do
+    before(:each) do
+      @request = QBFC::Request.new(@sess, 'CustomerQuery')
+      @ret_list = mock('RetElementList')
+      
+      @ole_request.stub!(:respond_to_ole?).with('IncludeLineItems').and_return(true)
+      @ole_request.stub!(:respond_to_ole?).with('IncludeLinkedTxns').and_return(true)
+      @ole_request.stub!(:respond_to_ole?).with('IncludeTxnID').and_return(false)
+      @ole_request.stub!(:respond_to_ole?).with('IncludeCustomerRef').and_return(false)
+    end
+    
+    it "should add specific include requests" do
+      @ole_request.should_receive(:include_line_items=).with(true)
+      @request.__send__(:add_includes, [:line_items])
+    end
+    
+    it "should apply additional includes to IncludeRetElementList" do
+      @ole_request.should_receive(:IncludeRetElementList).twice.and_return(@ret_list)
+      @ret_list.should_receive(:Add).with('TxnID')
+      @ret_list.should_receive(:Add).with('CustomerRef')
+      @request.__send__(:add_includes, [:txn_id, :customer_ref])
+    end
+    
+    it "should include :all" do
+      @ole_request.should_receive(:ole_methods).and_return(%w{ORTxnQuery IncludeLineItems IncludeLinkedTxns iterator})
+      @ole_request.should_receive(:include_line_items=).with(true)
+      @ole_request.should_receive(:include_linked_txns=).with(true)
+      @request.__send__(:add_includes, :all)
     end
   end
   

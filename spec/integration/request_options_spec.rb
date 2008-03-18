@@ -16,35 +16,35 @@ describe "Request options: " do
   end
   
   describe "Invoice" do
-    def assert_line_items
-      inv.invoice_lines[0].desc == "First Line"
-      inv.invoice_lines[1].desc == "Second Line"
-      inv.invoice_lines[2].desc == "3rd Line"
+    def assert_line_items(inv)
+      inv.ORInvoiceLineRetList[0].InvoiceLineRet.desc == "First Line"
+      inv.ORInvoiceLineRetList[1].InvoiceLineRet.desc == "Second Line"
+      inv.ORInvoiceLineRetList[2].InvoiceLineRet.desc == "3rd Line"
     end
     
-    def assert_linked_txns
-      inv.linked_txn[0].ref_number.should == '1972'
-      inv.linked_txn[0].amount.should == 1100.00    
+    def assert_linked_txns(inv)
+      inv.LinkedTxnList[0].ref_number.should == '1972'
+      inv.LinkedTxnList[0].amount.should == -300.00   
     end
   
     it "should include line items" do
-      inv = @sess.invoices.find(2, :include => [:line_items])
-      assert_line_items
+      inv = @sess.invoices.find_by_ref('2', :include => [:line_items])
+      assert_line_items(inv)
     end
     
     it "should include linked txns" do
-      inv = @sess.invoices.find(2, :include => [:linked_txns])
-      assert_linked_txns
+      inv = @sess.invoices.find_by_ref('2', :include => [:linked_txns])
+      assert_linked_txns(inv)
     end
     
     it "should include include all (line items and linked txns)" do
-      inv = @sess.invoices.find(2, :include => [:all])
-      assert_line_items
-      assert_linked_txns
+      inv = @sess.invoices.find_by_ref('2', :include => [:all])
+      assert_line_items(inv)
+      assert_linked_txns(inv)
     end
     
     it "should include a subset of elements" do
-      inv = @sess.invoices.find(2,
+      inv = @sess.invoices.find_by_ref('2',
           :include => [:txn_id, :customer_ref, :bill_address])
       inv.txn_id.should_not be_nil
       inv.customer_ref.full_name.should_not be_nil
@@ -56,12 +56,12 @@ describe "Request options: " do
     end
     
     it "should only txn_id" do
-      inv = @sess.invoices.find(2,
+      inv = @sess.invoices.find_by_ref('2',
           :include => [:txn_id])
       inv.txn_id.should_not be_nil
 
-      inv.customer_ref.full_name.should be_nil
-      inv.bill_address.addr1.should be_nil
+      inv.customer_ref.should be_nil
+      inv.bill_address.should be_nil
     end
   end
   

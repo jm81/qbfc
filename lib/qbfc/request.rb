@@ -120,6 +120,7 @@ module QBFC
           
         add_owner_ids(options.delete(:owner_id))
         add_limit(options.delete(:limit))
+        add_includes(options.delete(:include))
 
         options.each do |key, value|
           self.send(key.to_s.camelize).SetValue(value)
@@ -142,6 +143,50 @@ module QBFC
     # Set MaxReturned to limit the number of records returned.
     def add_limit(limit)
       filter.max_returned = limit if limit
+    end
+    
+    # add_includes accepts an Array of elements to include in the return of the
+    # Request. The array may include either or both of elements that are
+    # additional to normal returns (such as Line Items, Linked Transactions)
+    # or elements that are normally included (to be added to the
+    # IncludeRetElementList).
+    # 
+    # If elements are given that would be added to IncludeRetElementList, this
+    # limits the elements returned to *only* those included in the array.
+    # 
+    # Another option is to give :all as the argument, which will always return
+    # as many elements as possible.
+    # 
+    # add_includes is typically called by #apply_options, typically called
+    # from Element.find, as seen in the examples below:
+    # 
+    #   @sess.checks.find(:all, :include => [:linked_txns]) -> Include linked transactions
+    #   @sess.checks.find(:all, :include => [:txn_id]) -> Include +only+ TxnID
+    #   @sess.checks.find(:all, :include => :all) ->
+    #     Includes all elements, including LinkedTxns and LineItems.
+    def add_includes(inc)
+      return if inc.nil?
+      
+      inc = [inc] if (!inc.respond_to?(:each) || inc.kind_of?(String))
+      
+      if inc.include?(:all)
+        ole_methods.each do |m|
+          m = m.to_s
+          if m =~ /\AInclude/ && m != 'IncludeRetElementList'
+            @request.__send__("#{m.underscore}=", true)
+          end
+        end
+        return
+      end
+      
+      inc.each do |item|
+        cam_item = item.to_s.camelize.gsub(/Id/, "ID")
+        if @request.respond_to_ole?("Include#{cam_item}")
+          @request.__send__("include_#{item}=", true)
+        else
+          @request.IncludeRetElementList.Add(cam_item)
+        end
+      end
     end
     
     # Parse a value for a range filter. This can be a Range, a one or more
