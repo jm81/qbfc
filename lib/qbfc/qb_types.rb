@@ -7,9 +7,6 @@ QBFC_DELETE_ONLY = %w{PayrollItemNonWage DataEventRecoveryInfo}
 QBFC_REPORT_TYPES = %w{AgingReport BudgetSummaryReport CustomDetailReport CustomSummaryReport
                       GeneralDetailReport GeneralSummaryReport JobReport PayrollDetailReport PayrollSummaryReport TimeReport }
 
-# Types that allow Special adds (Pre-defined and normally added automatically by QuickBooks)
-QBFC_HAS_SPECIAL_ADD = %w{Account Item}
-
 # TODO: Here and below arrays I haven't yet formed any approach to dealing with.
 # I leave them here as a reminder.
 ELEMENTS_ADD_MOD = %w{ DataExt }         
