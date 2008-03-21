@@ -1,7 +1,7 @@
 # This file sets up the classes for QuickBooks entities, transactions and reports.
 
 # Types that allow Query and Delete only
-QBFC_DELETE_ONLY = %w{PayrollItemNonWage DataEventRecoveryInfo}
+QBFC_DELETE_ONLY = %w{DataEventRecoveryInfo}
 
 # Report types return an IReportRet
 QBFC_REPORT_TYPES = %w{AgingReport BudgetSummaryReport CustomDetailReport CustomSummaryReport
