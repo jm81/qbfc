@@ -63,7 +63,7 @@ require 'rake/gempackagetask'
 
 spec = Gem::Specification.new do |s|
   s.name = "qbfc"
-  s.version = "0.1.0"
+  s.version = "0.2.0"
   s.author = "Jared Morgan"
   s.email = "jmorgan@morgancreative.net"
   s.homepage = "http://rubyforge.org/projects/qbfc/"
