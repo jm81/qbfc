@@ -90,8 +90,15 @@ module QBFC
         setup_array(s)
       elsif detect_ole_method?(@ole_object, (s = "OR" + symbol.to_s.singularize.camelize + "RetList"))
         setup_array(s, true)
+      elsif detect_ole_method?(@ole_object, (s = symbol.to_s.singularize.camelize + "List"))
+        setup_array(s)
+      elsif detect_ole_method?(@ole_object, (s = "OR" + symbol.to_s.singularize.camelize + "List"))
+        setup_array(s, true)
       elsif ref_name(symbol)
         create_ref(ref_name(symbol), *params)
+      elsif detect_ole_method?(@ole_object, symbol)
+        # Occassionally, QBFC uses a lower case method
+        @ole_object.send(symbol, *params)
       else
         raise NoMethodError, symbol.to_s
       end 

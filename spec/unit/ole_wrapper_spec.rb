@@ -54,7 +54,7 @@ describe QBFC::OLEWrapper do
       @full_name.stub!(:ole_methods).and_return(['GetValue', 'SetValue'])
       
       @ole_object.stub!(:FullName).and_return(@full_name)
-      @ole_object.stub!(:ole_methods).and_return(['FullName', 'LineRetList', 'PayeeEntityRef', 'AccountRef', 'TimeModified', 'ListID', 'ORInvoiceLineRetList'])
+      @ole_object.stub!(:ole_methods).and_return(['FullName', 'LineRetList', 'PayeeEntityRef', 'AccountRef', 'TimeModified', 'ListID', 'ORInvoiceLineRetList', 'ColDataList', 'ORReportDataList', 'colID'])
     end
     
     it "should call a capitalized method directly" do
@@ -206,6 +206,43 @@ describe QBFC::OLEWrapper do
       
       @wrapper.qbfc_method_missing(@sess, :invoice_lines).should ==
         [list_item, list_item]
+    end
+    
+    it "should wrap *List objects in an Array" do
+      ret_list = mock('WIN32OLE.List')
+      ret_list.stub!(:ole_methods).and_return(['GetAt', 'Count'])
+      ret_list.should_receive(:Count).and_return(2)
+      ret_list.should_receive(:GetAt).with(0).and_return(@full_name)
+      ret_list.should_receive(:GetAt).with(1).and_return(@full_name)
+    
+      @ole_object.should_receive(:ColDataList).and_return(ret_list)
+      
+      @full_name_wrapper = QBFC::OLEWrapper.new(@full_name)
+      QBFC::OLEWrapper.should_receive(:new).with(@full_name).twice.and_return(@full_name_wrapper)
+      
+      @wrapper.qbfc_method_missing(@sess, :col_datas).should ==
+        [@full_name_wrapper, @full_name_wrapper]
+    end
+    
+    it "should wrap OR*List objects in an Array" do
+      ret_list = mock('WIN32OLE.ORInvoiceLineList')
+      list_item_wrapper = mock('WIN32OLE.InvoiceLineWrapper')
+      list_item = mock('WIN32OLE.InvoiceLine')
+      ret_list.stub!(:ole_methods).and_return(['GetAt', 'Count'])
+      ret_list.should_receive(:Count).and_return(2)
+      ret_list.should_receive(:GetAt).with(0).and_return(list_item_wrapper)
+      ret_list.should_receive(:GetAt).with(1).and_return(list_item_wrapper)
+      list_item_wrapper.should_receive(:ReportData).twice.and_return(list_item)
+    
+      @ole_object.should_receive(:ORReportDataList).and_return(ret_list)
+      
+      @wrapper.qbfc_method_missing(@sess, :report_datas).should ==
+        [list_item, list_item]
+    end
+    
+    it "should call a lower-case method defined by QBFC" do
+      @ole_object.should_receive(:colID).and_return('Id')
+      @wrapper.qbfc_method_missing(@sess, :colID).should == 'Id'
     end
     
     it "should have *_full_name for *Ref" do
