@@ -34,6 +34,6 @@ module QBFC
   end
 end
 
-%w{ ole_wrapper qbfc_const session request base element info qb_collection qb_types }.each do |file|
+%w{ ole_wrapper qbfc_const session request base element info report qb_collection qb_types }.each do |file|
   require File.dirname(__FILE__) + '/qbfc/' + file
 end
