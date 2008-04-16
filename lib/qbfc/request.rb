@@ -29,6 +29,7 @@ module QBFC
       end
       
       begin
+        @name = request_type
         @request = @request_set.send("Append#{request_type}Rq")
       rescue WIN32OLERuntimeError => error
         if error.to_s =~ /error code:0x80020006/
@@ -48,6 +49,11 @@ module QBFC
     # The response does not include any MsgSetResponse attributes.
     def response
       submit.ResponseList.GetAt(0).Detail
+    end
+    
+    # Is this Query for a Report? The 'conditions' are treated differently
+    def for_report?
+      @name =~ /Report$/
     end
     
     # Get the OR*Query object of the given Request
@@ -211,6 +217,11 @@ module QBFC
       # List queries place the modified_date_range directly in the filter
       if name == 'ModifiedDateRangeFilter'
         return filter if filter.respond_to_ole?('FromModifiedDate')
+      end
+      
+      # Report Periods are more or less special circumstance
+      if name =~ /^Report[Period|Date]/
+        return @request.ORReportPeriod.ReportPeriod
       end
       
       # Try to get the filter directly

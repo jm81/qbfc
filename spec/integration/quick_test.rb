@@ -5,7 +5,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 def run_test
           @sess.report('ProfitAndLossStandard',
-            :report_date_range => [Date.parse("2007-08-01"), Date.parse("2007-08-31")],
+            :conditions => {
+              :report_date_range => [Date.parse("2007-08-01"), Date.parse("2007-08-31")]},
             :report_basis => QBFC_CONST::RbAccrual)
 end
 

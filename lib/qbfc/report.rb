@@ -18,7 +18,7 @@ module QBFC
         q ||= create_query(sess)
         q.apply_options(options)
         q.send(qb_name + 'Type').
-            SetValue(QBFC::const_get(self::REPORT_TYPE_PREFIX + name))
+            SetValue(QBFC_CONST::const_get(self::REPORT_TYPE_PREFIX + name))
         q.response_xml
       end
       
