@@ -4,10 +4,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 # The implementation that this tests is Request#apply_options
 
 def run_test
-
-  inv = @sess.invoices.find_by_ref('2', :include => [:line_items])
-p inv.ORInvoiceLineRetList[0].InvoiceLineRet.desc
-  inv.ORInvoiceLineRetList.Count
+          @sess.report('ProfitAndLossStandard',
+            :report_date_range => [Date.parse("2007-08-01"), Date.parse("2007-08-31")],
+            :report_basis => QBFC_CONST::RbAccrual)
 end
 
 # Setup

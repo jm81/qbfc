@@ -101,6 +101,12 @@ module QBFC
       @ole_object = nil
     end
     
+    # Generate a report with the given +name+ and +args+.
+    # (See QBFC::Report.new for details).
+    def report(name, *args)
+      Report.new(self, name, *args)
+    end
+    
     # The classes method allows using <tt>session.classes.find</tt> instead of
     # <tt>session.q_b_classes.find</tt>, for finds on QBClass.
     def classes
