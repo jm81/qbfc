@@ -102,9 +102,9 @@ module QBFC
     end
     
     # Generate a report with the given +name+ and +args+.
-    # (See QBFC::Report.new for details).
+    # (See QBFC::Report.get for details).
     def report(name, *args)
-      Report.new(self, name, *args)
+      Report.get(self, name, *args)
     end
     
     # The classes method allows using <tt>session.classes.find</tt> instead of

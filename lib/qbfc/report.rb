@@ -19,7 +19,7 @@ module QBFC
         q.apply_options(options)
         q.send(qb_name + 'Type').
             SetValue(QBFC_CONST::const_get(self::REPORT_TYPE_PREFIX + name))
-        q.response_xml
+        q.response
       end
       
       # The QuickBooks name for this Report.
@@ -28,22 +28,51 @@ module QBFC
       def qb_name
         self.name.split('::').last + 'Report'
       end
+    
+      # Get a new Report.
+      # This is roughly equivalent with QBFC::Element::find.
+      # - <tt>sess</tt>: An open QBFC::Session object that will recieve all requests.
+      # - <tt>name</tt>: The name of the report.
+      # - <tt>args</tt>: TODO.
+      def get(sess, name, *args)
+        klass = get_class(name)
+        klass.new(sess, klass.query(sess, name, *args))
+      end
     end
     
-    # Create a new Report.
-    # This is more equivalent with QBFC::Element::find than QBFC::Element::new,
-    # since the report can not be modified or a new instance "created",
-    # - <tt>sess</tt>: An open QBFC::Session object that will recieve all requests.
-    # - <tt>name</tt>: The name of the report.
-    # - <tt>args</tt>: TODO.
-    def initialize(sess, name, *args)
-      klass = self.class.get_class(name)
-      if klass != self.class
-        # Initialize report of appropriate class.
-        klass.new(sess, name, *args)
-      else
-        @sess = sess
-        self.class.query(sess, name, *args)
+    def rows
+      @rows ||= QBFC::Reports::Rows::parse(@ole.report_data)
+    end
+    
+    def data
+      rows[:data]
+    end
+    
+    def subtotals
+      rows[:subtotals]
+    end
+    
+    def totals
+      rows[:totals]
+    end
+    
+    def text_rows
+      rows[:text]
+    end
+    
+    def cell(row_name, col_name)
+      rows[:data][row_name][col_for(col_name)]
+    end
+    
+    def col_for(name)
+      @ole.col_descs.each do |col|
+        col.col_titles.each do |title|
+          if title.value
+            if (title.value.GetValue() == name)
+              return col.colID.GetValue().to_i - 1
+            end
+          end
+        end
       end
     end
   end
