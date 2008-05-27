@@ -118,8 +118,7 @@ module QBFC
       #     :account => 'Checking'
       #     :entity => ['ABC Supplies', 'CompuStuff']
       # 
-      def find(sess, what, *args)
-        
+      def find(sess, what, *args)       
         if what.kind_of?(String) # Single FullName or ListID
           return find_by_unique_id(sess, what, *args)
         end
@@ -127,6 +126,7 @@ module QBFC
         # Setup q, options and base_options arguments
         q, options, base_options = parse_find_args(*args)
         q ||= create_query(sess)
+        ignore_base_class = options.delete(:ignore_base_class)
         
         q.apply_options(options)
         
@@ -138,7 +138,9 @@ module QBFC
         
         # Send the query so far to base_class_find if this is
         # a base class to handle special base class functionality.
-        return base_class_find(sess, what, q, base_options) if is_base_class?
+        if is_base_class? && !ignore_base_class
+          return base_class_find(sess, what, q, base_options)
+        end
         
         # Get response and return an Array, a QBFC::Element-inherited
         # object, or nil, depending on <tt>what</tt> argument and whether
@@ -195,10 +197,6 @@ module QBFC
     # Extends Base#initialize to allow for an Add Request if
     # .new is called directly (instead of by .find)
     def initialize(sess, ole_object = nil)
-      if self.class.is_base_class?
-        raise BaseClassNewError, "This is a base class which doesn't allow object initialization"
-      end
-      
       super
       
       if @ole.nil?
@@ -215,10 +213,10 @@ module QBFC
     end
   
     # Access information from a custom field.
-    def custom(field_name, owner_id = 0)
+    def custom(field_name, owner_id = '0')
       if @ole.DataExtRetList
         @ole.data_ext.each do |field|
-          if field.data_ext_name == field_name && field.owner_id == owner_id
+          if field.data_ext_name == field_name && field.owner_id == owner_id.to_s
             return field.data_ext_value
           end
         end
