@@ -30,6 +30,33 @@ module QBFC
       
       alias_method :find_by_unique_id, :find_by_ref_or_id
       
+      def base_class_find(sess, what, q, options)
+        q.IncludeRetElementList.Add(self::ID_NAME)
+        q.IncludeRetElementList.Add('TxnType')
+        list = q.response
+        
+        if list.nil?
+          (what == :all) ? [] : nil
+        else
+          ary = (0..(list.Count - 1)).collect { |i|
+            element = list.GetAt(i)
+            ret_class_name = element.TxnType.GetAsString
+            if QBFC::const_defined?(ret_class_name)
+              ret_class = QBFC::const_get(ret_class_name)
+              ret_class.find(sess, element.send(ret_class::ID_NAME).GetValue, options.dup)
+            else
+              find(sess, element.send(Transaction::ID_NAME).GetValue, options.dup.merge(:ignore_base_class => true))
+            end
+          }
+          
+          if what == :all
+            ary
+          else
+            ary[0]
+          end
+        end
+      end
+      
     end
     
     # Alias of TxnID for this record.
