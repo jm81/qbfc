@@ -228,6 +228,13 @@ module QBFC
       if filter.respond_to_ole?(name)
         f = filter.send(name)
       end
+
+      # Transaction Date Range Filters change name.
+      if name == 'TxnDateRangeFilter'
+        f = filter.send("TransactionDateRangeFilter").
+            send("ORTransactionDateRangeFilter").
+            send("TxnDateRange")
+      end
       
       # Check if this is within an 'OR'
       if filter.respond_to_ole?("OR#{name}")
