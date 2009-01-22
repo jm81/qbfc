@@ -14,8 +14,8 @@ module QBFC
       # a Request object and/or an options Hash. <tt>parse_find_args</tt>
       # gets these arguments into a set that is easier to deal with.
       def parse_find_args(*args)
-        request = args[0].kind_of?(QBFC::Request) ? args[0] : nil
-        options = args[-1].kind_of?(Hash) ? args[-1] : {}
+        request = args[0].kind_of?(QBFC::Request) ? args[0].dup : nil
+        options = args[-1].kind_of?(Hash) ? args[-1].dup : {}
         
         # base classes will need to pass a subset of options to
         # the ChildClass.find . Also, the actually options to the
