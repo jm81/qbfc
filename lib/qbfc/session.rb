@@ -87,7 +87,8 @@ module QBFC
       rescue WIN32OLERuntimeError
         ole_object.CloseConnection
         ole_object = nil
-        raise QBFC::QuickbooksClosedError, "BeginSession failed: Quickbooks must be open or a valid filename specified."
+        raise(QBFC::QuickbooksClosedError,
+            "BeginSession failed: Quickbooks must be open or a valid filename specified.\n\n#{$!}")
       end
       
       @ole_object = QBFC::OLEWrapper.new(ole_object)
