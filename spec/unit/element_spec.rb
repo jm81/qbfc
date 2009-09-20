@@ -37,16 +37,6 @@ describe QBFC::Element do
       QBFC::Test::NormalKlass.new(@sess).
           instance_variable_get(:@setter).should == @request
     end
-    
-    it "should error if class is_base_class?" do
-      lambda {
-        QBFC::Test::BaseKlass.new(@sess)
-      }.should raise_error(QBFC::BaseClassNewError)
-
-      lambda {
-        QBFC::Test::BaseKlass.new(@sess, @ole_wrapper)
-      }.should raise_error(QBFC::BaseClassNewError)
-    end
   end
   
   describe "#new_record?" do
