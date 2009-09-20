@@ -32,6 +32,7 @@ describe QBFC::Element do
     @request = mock("QBFC::Request")
     @request.stub!(:kind_of?).with(QBFC::Request).and_return(true)
     @request.stub!(:kind_of?).with(Hash).and_return(false)
+    @request.stub!(:dup).and_return(@request)
     @response = mock("QBFC::Request#response")
     
     # Filter mock

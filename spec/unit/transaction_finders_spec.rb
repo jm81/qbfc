@@ -17,6 +17,7 @@ describe QBFC::Transaction do
     
     # Request related mocks
     @request = mock("QBFC::Request")
+    @request.stub!(:dup).and_return(@request)
     @txn_query = mock("QBFC::OLEWrapper#txn_query")
     @response = mock("QBFC::Request#response")
     

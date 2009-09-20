@@ -89,12 +89,12 @@ describe QBFC::Base do
       rq.should be_nil
     end
     
-    it "should return options if given them" do
+    it "should return dup of options if given them" do
       rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @request, @options)
-      opt.should be(@options)
+      opt.should == @options
       
       rq, opt, base_opt = QBFC::Test::ElementFind.__send__(:parse_find_args, @options)
-      opt.should be(@options)
+      opt.should == @options
     end
     
     it "should return an empty hash for options if not given them" do

@@ -17,6 +17,7 @@ describe QBFC::List do
 
     # Request related mocks
     @request = mock("QBFC::Request")
+    @request.stub!(:dup).and_return(@request)
     @list_query = mock("QBFC::OLEWrapper#list_query")
     @response = mock("QBFC::Request#response")
     
