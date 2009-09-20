@@ -130,6 +130,7 @@ describe QBFC::Element do
 
   describe ".base_class_find" do
     before(:each) do
+      @include_list = mock("IncludeRetElementList")
       @request.stub!(:IncludeRetElementList).and_return(@include_list)
       @include_list.stub!(:Add).with("ListID")
       @request.stub!(:response).and_return(@response)
