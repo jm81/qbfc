@@ -126,7 +126,7 @@ module QBFC
         # Setup q, options and base_options arguments
         q, options, base_options = parse_find_args(*args)
         q ||= create_query(sess)
-        ignore_base_class = options.delete(:ignore_base_class)
+        ignore_base_class = options.kind_of?(Hash) ? options.delete(:ignore_base_class) : false
         
         q.apply_options(options)
         
