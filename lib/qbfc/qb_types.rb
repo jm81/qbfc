@@ -8,7 +8,7 @@ QBFC_NON_STANDARD_TYPES = %w{ DataExt DataExtDef DataEventRecoveryInfo ItemAssem
 
 # Query types support Query requests only and return an itemized list of some sort;
 # most of these may be integrated as special finders for their types.
-QBFC_QUERY_TYPES =  %w{BillToPay ListDeleted ReceivePaymentToDeposit Template TxnDeleted SalesTaxPaymentCheck}
+QBFC_QUERY_TYPES =  %w{BillToPay ListDeleted ReceivePaymentToDeposit Template TxnDeleted}
 
 module QBFC
   # Create QBElement classes
