@@ -82,7 +82,7 @@ describe QBFC::Element do
   
     it "should get custom fields" do
       @data_ext.should_receive(:data_ext_name).and_return("Custom Field")
-      @data_ext.should_receive(:owner_id).and_return(0)
+      @data_ext.should_receive(:owner_id).and_return('0')
       @data_ext.should_receive(:data_ext_value).and_return("Hello")
       
       @element.custom("Custom Field").should == "Hello"
