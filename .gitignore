@@ -8,3 +8,4 @@ pkg
 *qt_temp*
 *~
 *.qbw.nd
+spec/tmp
