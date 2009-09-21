@@ -79,8 +79,8 @@ module QBFC
 end
 
 # Require subclass files
-Dir[File.dirname(__FILE__) + '/reports/*.rb'].each do |file|
-  require file
+Dir.new(File.dirname(__FILE__) + '/reports').each do |file|
+  require('qbfc/reports/' + File.basename(file)) if File.extname(file) == ".rb"
 end
 
 module QBFC

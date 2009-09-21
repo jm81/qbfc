@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 # This spec describes use of the options to Element.find
 # (except :conditions, which is in conditions_spec.rb)

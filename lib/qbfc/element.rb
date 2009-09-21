@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/modifiable'
+require 'qbfc/modifiable'
 
 module QBFC
 
@@ -239,5 +239,5 @@ end
 
 # Require subclass files
 %w{ list transaction }.each do |file|
-  require File.dirname(__FILE__) + '/' + file
+  require 'qbfc/' + file
 end

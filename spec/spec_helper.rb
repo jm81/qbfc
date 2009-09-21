@@ -1,7 +1,6 @@
 require 'rubygems'
-gem 'rspec'
 require 'spec'
-require File.expand_path(File.dirname(__FILE__) + '/../lib/qbfc')
+require 'qbfc'
 
 Spec::Runner.configure do |config|
 

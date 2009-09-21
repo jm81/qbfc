@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/voidable'
+require 'qbfc/voidable'
 
 module QBFC
   class Transaction < Element
@@ -105,6 +105,6 @@ module QBFC
 end
 
 # Require subclass files
-Dir[File.dirname(__FILE__) + '/transactions/*.rb'].each do |file|
-  require file
+Dir.new(File.dirname(__FILE__) + '/transactions').each do |file|
+  require('qbfc/transactions/' + File.basename(file)) if File.extname(file) == ".rb"
 end

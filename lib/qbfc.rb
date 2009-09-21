@@ -8,6 +8,8 @@ unless Object.const_defined?(:ActiveSupport)
 end
 
 module QBFC
+  VERSION = '0.3.0'
+  
   class << self
   
     # Opens and yields a QBFC::Session
@@ -35,5 +37,5 @@ module QBFC
 end
 
 %w{ ole_wrapper qbfc_const session request base element info report qb_collection qb_types }.each do |file|
-  require File.dirname(__FILE__) + '/qbfc/' + file
+  require 'qbfc/' + file
 end

@@ -76,9 +76,9 @@ end
 
 # Require subclass files
 %w{ entity item terms }.each do |file|
-  require File.dirname(__FILE__) + '/' + file
+  require 'qbfc/' + file
 end
 
-Dir[File.dirname(__FILE__) + '/lists/*.rb'].each do |file|
-  require file
+Dir.new(File.dirname(__FILE__) + '/lists').each do |file|
+  require('qbfc/lists/' + File.basename(file)) if File.extname(file) == ".rb"
 end
