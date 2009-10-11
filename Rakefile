@@ -7,6 +7,9 @@ begin
     gem.name = "qbfc"
     gem.rubyforge_project = "qbfc"
     gem.summary = "A wrapper around the QBFC COM object of the Quickbooks SDK"
+    gem.description = %q{QBFC-Ruby wraps the QBFC COM object of the QuickBooks 
+SDK, providing ease-of-use improvements, such as lower-case method names, 
+and find, save, delete, void, and create operations.}
     gem.email = "jmorgan@morgancreative.net"
     gem.homepage = "http://rubyforge.org/projects/qbfc/"
     gem.authors = ["Jared Morgan"]
@@ -15,7 +18,7 @@ begin
   
   rf = Jeweler::RubyforgeTasks.new
   rf.remote_doc_path = ''
-
+  Jeweler::GemcutterTasks.new
 rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
 end

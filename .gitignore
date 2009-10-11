@@ -9,3 +9,5 @@ pkg
 *~
 *.qbw.nd
 spec/tmp
+*.gem
+

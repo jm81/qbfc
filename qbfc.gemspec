@@ -9,7 +9,10 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jared Morgan"]
-  s.date = %q{2009-09-21}
+  s.date = %q{2009-10-11}
+  s.description = %q{QBFC-Ruby wraps the QBFC COM object of the QuickBooks 
+SDK, providing ease-of-use improvements, such as lower-case method names, 
+and find, save, delete, void, and create operations.}
   s.email = %q{jmorgan@morgancreative.net}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -20,8 +23,6 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
-     "init.rb",
-     "install.rb",
      "lib/qbfc.rb",
      "lib/qbfc/base.rb",
      "lib/qbfc/element.rb",
@@ -59,6 +60,7 @@ Gem::Specification.new do |s|
      "lib/qbfc/transaction.rb",
      "lib/qbfc/transactions/generated.rb",
      "lib/qbfc/voidable.rb",
+     "qbfc.gemspec",
      "spec/fixtures/test.lgb",
      "spec/fixtures/test.qbw",
      "spec/fixtures/test.qbw.TLG",
@@ -103,15 +105,13 @@ Gem::Specification.new do |s|
      "spec/unit/transaction_spec.rb",
      "spec/unit/transactions/generated_spec.rb",
      "spec/unit/voidable_spec.rb",
-     "tasks/qbfc_tasks.rake",
-     "uninstall.rb"
+     "tasks/qbfc_tasks.rake"
   ]
-  s.has_rdoc = true
   s.homepage = %q{http://rubyforge.org/projects/qbfc/}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{qbfc}
-  s.rubygems_version = %q{1.3.1}
+  s.rubygems_version = %q{1.3.5}
   s.summary = %q{A wrapper around the QBFC COM object of the Quickbooks SDK}
   s.test_files = [
     "spec/integration/add_spec.rb",
@@ -156,7 +156,7 @@ Gem::Specification.new do |s|
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 2
+    s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
     else
