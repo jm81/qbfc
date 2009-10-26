@@ -62,6 +62,12 @@ Example: for the payee of a Check, <tt>check.payee_id</tt> and
   
 ==Alternatives
 
+[BehindLogic Quickbooks Rubygem]
+  homepage: http://behindlogic.com
+  
+  This gem covers the full API and does validations. I haven't tried it out, 
+  but the code samples look straightforward. ($199 for a internal license)
+
 [QuickBooks for Ruby]
   (docs: http://quickbooks.rubyforge.org,
   homepage: http://rubyforge.org/projects/quickbooks)
